@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.ArrayList;
+import java.util.HexFormat;
 import java.util.List;
 
 @Component
@@ -14,6 +15,7 @@ public class WordsFinder {
 
 	private static final Logger logger = LoggerFactory.getLogger(WordsFinder.class);
 
+	private static final HexFormat HEX_FORMAT = HexFormat.of();
 	private static MessageDigest DIGEST;
 
 	public WordsFinder() {
@@ -24,7 +26,7 @@ public class WordsFinder {
 		}
 	}
 
-	public void findWords(List<String> alphabet, List<String> hashes) {
+	public List<String> findWords(List<String> alphabet, List<String> hashes) {
 
 		logger.info("Finding words ...");
 
@@ -37,15 +39,14 @@ public class WordsFinder {
 		}
 
 		logger.info("Found {} words", foundWords.size());
+		return foundWords;
 	}
 
-	private static void variations(List<String> prefix,
-						   List<String> alphabet,
-						   long depth,
-						   List<String> foundWords,
-						   List<String> hashes) {
-
-
+	private static List<String> variations(List<String> prefix,
+										   List<String> alphabet,
+										   long depth,
+										   List<String> foundWords,
+										   List<String> hashes) {
 
 		if (depth > 2 && depth <= 12) { //todo: <= 12
 			String word = prefix.stream()
@@ -54,9 +55,11 @@ public class WordsFinder {
 
 			if (!foundWords.contains(word)) {
 				byte[] encodedHash = DIGEST.digest(word.getBytes(StandardCharsets.UTF_8));
-				String sha256 = bytesToHex(encodedHash);
+				//				final String sha256 = bytesToHex(encodedHash);
+				final String sha256 = HEX_FORMAT.formatHex(encodedHash);
 				if (hashes.contains(sha256)) {
-					logger.info("Found word: {} -> {}", word, sha256);
+					//				if (containsBytes(hashes, encodedHash)) {
+					logger.info("Found word: {} -> {}", word, bytesToHex(encodedHash));
 					// WORD_HASHES.remove(sha256); // adding this will prevent finding of collisions
 					foundWords.add(word);
 				}
@@ -71,6 +74,7 @@ public class WordsFinder {
 			newPrefix.add(alphabet.get(i));
 			variations(newPrefix, newAlphabet, depth + 1, foundWords, hashes);
 		}
+		return foundWords;
 	}
 
 	private static String bytesToHex(byte[] hash) {
@@ -83,6 +87,15 @@ public class WordsFinder {
 			hexString.append(hex);
 		}
 		return hexString.toString();
+	}
+
+	private static boolean containsBytes(List<byte[]> hashes, byte[] hash) {
+		for (byte[] h : hashes) {
+			if (MessageDigest.isEqual(h, hash)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 }

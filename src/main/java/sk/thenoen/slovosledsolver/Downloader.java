@@ -28,11 +28,13 @@ public class Downloader {
 
 	public String[] retrieveHashes() {
 		final String pageContent = retrievePageContent();
+		// todo: here should be caching
 		return parseHashes(pageContent);
 	}
 
 	public List<String> retrieveGrid() {
 		final String pageContent = retrievePageContent();
+		// todo: here should be caching
 		return parseGrid(pageContent);
 	}
 
@@ -108,6 +110,7 @@ public class Downloader {
 	}
 
 	private static String readPageFromCache(File fileCache) {
+		logger.info("Page cache file exists - loading...");
 		try (BufferedReader reader = new BufferedReader(new FileReader(fileCache))) {
 			return reader.lines()
 						 .collect(Collectors.joining());

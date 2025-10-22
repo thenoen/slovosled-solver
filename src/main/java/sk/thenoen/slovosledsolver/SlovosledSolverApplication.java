@@ -35,15 +35,18 @@ public class SlovosledSolverApplication implements CommandLineRunner {
 		final String[] hashes = downloader.retrieveHashes();
 
 		final HexFormat hexFormat = HexFormat.of();
-//		final byte[] bytes = hexFormat.parseHex(hashes[0]);
-//		final String hex = hexFormat.formatHex(bytes);
-//		Arrays.stream(hashes)
-//				.map(hexFormat::parseHex)
-//				.collect(Collectors.toSet());
+		//		final byte[] bytes = hexFormat.parseHex(hashes[0]);
+		//		final String hex = hexFormat.formatHex(bytes);
+		final List<byte[]> hashesAsBytes = Arrays.stream(hashes)
+												 .map(hexFormat::parseHex)
+												 .toList();
 
 		final List<String> grid = downloader.retrieveGrid();
 
-		wordsFinder.findWords(grid, List.of(hashes));
+		final List<String> words = wordsFinder.findWords(grid, List.of(hashes));
+
+		logger.info("Number of hashes: {}", hashes.length);
+		logger.info("Number of words:  {}", words.size());
 
 		logger.info("SlovosledSolverApplication finished");
 	}
