@@ -8,6 +8,10 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.stereotype.Component;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HexFormat;
 import java.util.List;
@@ -47,6 +51,21 @@ public class SlovosledSolverApplication implements CommandLineRunner {
 
 		logger.info("Number of hashes: {}", hashes.length);
 		logger.info("Number of words:  {}", words.size());
+
+		MessageDigest digest = null;
+		try {
+			digest = MessageDigest.getInstance("SHA-256");
+		} catch (NoSuchAlgorithmException e) {
+			throw new RuntimeException(e);
+		}
+		final List<String> hashList = new ArrayList<>();
+		Arrays.asList(hashes).forEach(h -> hashList.add(h));
+		for (String w : words) {
+			byte[] encodedHash = digest.digest(w.getBytes(StandardCharsets.UTF_8));
+			final String hex = hexFormat.formatHex(encodedHash);
+			hashList.remove(hex);
+		}
+		hashList.forEach(h -> logger.info("remaining: {}", h));
 
 		logger.info("SlovosledSolverApplication finished");
 	}
