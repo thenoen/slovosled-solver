@@ -10,9 +10,10 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.HexFormat;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.Set;
 import java.util.concurrent.Future;
 
 @Component
@@ -46,17 +47,30 @@ public class WordsFinder {
 	}
 
 	private void shutdown() {
+		do {
+			logger.info("Waiting for tasks to finish ... Active: {},\tQueue: {}\t",
+						taskExecutor.getActiveCount(),
+						taskExecutor.getQueueSize());
+
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				throw new RuntimeException(e);
+			}
+		} while (taskExecutor.getActiveCount() > 0);
+
 		for (Future<List<String>> future : futures) {
 			try {
 				future.get();
 			} catch (Exception ex) {
-				throw new RuntimeException(ex);
+				logger.error("Error while waiting for task to finish", ex);
 			}
 		}
+
 		taskExecutor.shutdown();
 	}
 
-	public List<String> findWords(List<String> alphabet, List<String> hashes) {
+	public List<String> findWords(List<String> alphabet, Set<String> hashes) {
 
 		logger.info("Finding words ...");
 
@@ -69,38 +83,35 @@ public class WordsFinder {
 		}
 
 		shutdown();
-		logger.info("Found {} words", foundWords.size());
-		return foundWords;
+
+		final Set<String> uniqueWords = HashSet.newHashSet(hashes.size());
+		uniqueWords.addAll(foundWords);
+
+		logger.info("Finding words finished");
+		return List.of(uniqueWords.toArray(new String[0]));
 	}
 
 	private static void variations(List<String> prefix,
-										   List<String> alphabet,
-										   long depth,
-										   List<String> foundWords,
-										   List<String> hashes) {
+								   List<String> alphabet,
+								   long depth,
+								   List<String> foundWords,
+								   Set<String> hashes) {
 
-		//		if (depth > 2 && depth <= 12) { //todo: <= 12
-		if (depth > 0 && depth <= 12) {
+		if (depth > 2 && depth <= 12) {
 			String word = prefix.stream()
 								.map(Object::toString)
 								.reduce("", String::concat);
 
-//			if (!foundWords.contains(word)) {
-				byte[] encodedHash = createMessageDigest().digest(word.getBytes(StandardCharsets.UTF_8));
-				//				final String sha256 = bytesToHex(encodedHash);
-				final String sha256 = HEX_FORMAT.formatHex(encodedHash);
-				if (hashes.contains(sha256)) {
-					//				if (containsBytes(hashes, encodedHash)) {
-					logger.info("Found word: {} -> {}", word, bytesToHex(encodedHash));
-					// WORD_HASHES.remove(sha256); // adding this will prevent finding of collisions
-					foundWords.add(word);
-				}
-//			}
-
+			byte[] encodedHash = createMessageDigest().digest(word.getBytes(StandardCharsets.UTF_8));
+			final String sha256 = HEX_FORMAT.formatHex(encodedHash);
+			if (hashes.contains(sha256)) {
+				logger.debug("Found word: {} -> {}", word, bytesToHex(encodedHash));
+				// WORD_HASHES.remove(sha256); // adding this will prevent finding of collisions
+				foundWords.add(word);
+			}
 		}
 
-		if (depth % 6 == 0) {
-//			List<Future<List<String>>> futures = new ArrayList<>();
+		if (depth % 6 == 0) { //todo: is this ideal?
 			for (int i = 0; i < alphabet.size(); i++) {
 
 				final ArrayList<String> newAlphabet = new ArrayList<>(alphabet);
@@ -109,24 +120,12 @@ public class WordsFinder {
 				newPrefix.add(alphabet.get(i));
 
 				final Future<List<String>> future = taskExecutor.submit(() -> {
-//					List<String> newFoundWords = Collections.synchronizedList(new ArrayList<>());
 					List<String> newFoundWords = new ArrayList<>();
 					variations(newPrefix, newAlphabet, depth + 1, foundWords, hashes);
 					return newFoundWords;
 				});
 				futures.add(future);
 			}
-
-//			for (Future<List<String>> future : futures) {
-//				try {
-//					future.get();
-//					foundWords.addAll(future.get());
-//				} catch (Exception ex) {
-//					throw new RuntimeException(ex);
-//				}
-//			}
-//			futures.clear();
-//			return foundWords;
 			return;
 		}
 
@@ -137,7 +136,6 @@ public class WordsFinder {
 			newPrefix.add(alphabet.get(i));
 			variations(newPrefix, newAlphabet, depth + 1, foundWords, hashes);
 		}
-//		return foundWords;
 	}
 
 	private static String bytesToHex(byte[] hash) {

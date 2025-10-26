@@ -6,7 +6,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -15,7 +14,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HexFormat;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Set;
 
 @SpringBootApplication
 public class SlovosledSolverApplication implements CommandLineRunner {
@@ -38,19 +37,20 @@ public class SlovosledSolverApplication implements CommandLineRunner {
 
 		final String[] hashes = downloader.retrieveHashes();
 
+		//todo: verify that this is not faster implementation
 		final HexFormat hexFormat = HexFormat.of();
 		//		final byte[] bytes = hexFormat.parseHex(hashes[0]);
 		//		final String hex = hexFormat.formatHex(bytes);
-		final List<byte[]> hashesAsBytes = Arrays.stream(hashes)
-												 .map(hexFormat::parseHex)
-												 .toList();
+//		final List<byte[]> hashesAsBytes = Arrays.stream(hashes)
+//												 .map(hexFormat::parseHex)
+//												 .toList();
 
 		final List<String> grid = downloader.retrieveGrid();
 
-		final List<String> words = wordsFinder.findWords(grid, List.of(hashes));
+		final List<String> words = wordsFinder.findWords(grid, Set.of(hashes));
 
-		logger.info("Number of hashes: {}", hashes.length);
-		logger.info("Number of words:  {}", words.size());
+		logger.info("Number of parsed hashes: {}", hashes.length);
+		logger.info("Number of found words:   {}", words.size());
 
 		MessageDigest digest = null;
 		try {
