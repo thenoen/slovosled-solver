@@ -22,16 +22,14 @@ public class WordsFinder {
 	private static final Logger logger = LoggerFactory.getLogger(WordsFinder.class);
 
 	private static final HexFormat HEX_FORMAT = HexFormat.of();
-	private static MessageDigest DIGEST;
 	private static List<Future<List<String>>> futures = new ArrayList<>();
 
 	private static ThreadPoolTaskExecutor taskExecutor;
+	private static ThreadLocal<MessageDigest> threadLocalDigest = ThreadLocal.withInitial(WordsFinder::createMessageDigest);
 
 	public WordsFinder() {
-		DIGEST = createMessageDigest();
-
 		taskExecutor = new ThreadPoolTaskExecutorBuilder()
-				.corePoolSize(100)
+				.corePoolSize(15)
 				.maxPoolSize(100)
 				.queueCapacity(1_000_000_000)
 				.build();
@@ -110,7 +108,7 @@ public class WordsFinder {
 			prefix.forEach(stringBuilder::append);
 			String word = stringBuilder.toString();
 
-			byte[] encodedHash = createMessageDigest().digest(word.getBytes(StandardCharsets.UTF_8));
+			byte[] encodedHash = threadLocalDigest.get().digest(word.getBytes(StandardCharsets.UTF_8));
 			final String sha256 = HEX_FORMAT.formatHex(encodedHash);
 			if (hashes.contains(sha256)) {
 				logger.debug("Found word: {} -> {}", word, bytesToHex(encodedHash));
@@ -119,7 +117,7 @@ public class WordsFinder {
 			}
 		}
 
-		if (depth % 6 == 0) { //todo: is this ideal?
+		if (depth % 6 == 0) { // This seems to be ideal for 12 CPU cores (5 - too many tasks for Integer type, 7 too few tasks for 12 CPU cores)
 			for (int i = 0; i < alphabet.size(); i++) {
 
 				final ArrayList<String> newAlphabet = new ArrayList<>(alphabet);
