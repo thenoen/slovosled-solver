@@ -106,9 +106,9 @@ public class WordsFinder {
 								   Set<String> hashes) {
 
 		if (depth > 2 && depth <= 12) {
-			String word = prefix.stream()
-								.map(Object::toString)
-								.reduce("", String::concat);
+			final StringBuilder stringBuilder = new StringBuilder();
+			prefix.forEach(stringBuilder::append);
+			String word = stringBuilder.toString();
 
 			byte[] encodedHash = createMessageDigest().digest(word.getBytes(StandardCharsets.UTF_8));
 			final String sha256 = HEX_FORMAT.formatHex(encodedHash);
