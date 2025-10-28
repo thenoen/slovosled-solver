@@ -22,7 +22,7 @@ public class SlovosledSolverApplication implements CommandLineRunner {
 	private static final Logger logger = LoggerFactory.getLogger(SlovosledSolverApplication.class);
 
 	@Resource
-	private Downloader downloader;
+	private PageParser pageParser;
 
 	@Resource
 	private WordsFinder wordsFinder;
@@ -35,7 +35,7 @@ public class SlovosledSolverApplication implements CommandLineRunner {
 	public void run(String... args) {
 		logger.info("SlovosledSolverApplication started");
 
-		final String[] hashes = downloader.retrieveHashes();
+		final String[] hashes = pageParser.retrieveHashes();
 
 		//todo: verify that this is not faster implementation
 		final HexFormat hexFormat = HexFormat.of();
@@ -45,7 +45,7 @@ public class SlovosledSolverApplication implements CommandLineRunner {
 //												 .map(hexFormat::parseHex)
 //												 .toList();
 
-		final List<String> grid = downloader.retrieveGrid();
+		final List<String> grid = pageParser.retrieveGrid();
 
 		final List<String> words = wordsFinder.findWords(grid, Set.of(hashes));
 
