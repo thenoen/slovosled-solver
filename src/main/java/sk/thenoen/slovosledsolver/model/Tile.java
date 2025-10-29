@@ -1,20 +1,18 @@
 package sk.thenoen.slovosledsolver.model;
 
-public class Letter {
+public class Tile {
 
 	private String letter;
 	private int value;
 	private int usageCount;
 	private boolean selected;
 
-
-
-//	public Letter(String letter, int value, int usageCount, boolean selected) {
-//		super();
-//		this.letter = letter;
-//		this.value = value;
-//		this.usageCount = usageCount;
-//	}
+	//	public Letter(String letter, int value, int usageCount, boolean selected) {
+	//		super();
+	//		this.letter = letter;
+	//		this.value = value;
+	//		this.usageCount = usageCount;
+	//	}
 
 	public String getLetter() {
 		return letter;
@@ -46,5 +44,22 @@ public class Letter {
 
 	public void setSelected(boolean selected) {
 		this.selected = selected;
+	}
+
+	public Tile copy() {
+		final Tile tileCopy = new Tile();
+		tileCopy.setLetter(letter);
+		tileCopy.setValue(value);
+		tileCopy.setUsageCount(usageCount);
+		tileCopy.setSelected(selected);
+		return tileCopy;
+	}
+
+	public final void incrementUsageCount() {
+		usageCount++;
+		if (usageCount < 3) {
+			value++;
+		}
+		selected = true;
 	}
 }

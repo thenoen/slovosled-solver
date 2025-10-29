@@ -1,6 +1,5 @@
 package sk.thenoen.slovosledsolver;
 
-import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -13,19 +12,17 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import sk.thenoen.slovosledsolver.model.Letter;
+import sk.thenoen.slovosledsolver.model.Tile;
 
 class PageParserTest {
 
 	static PageDownloader pageDownloader = Mockito.mock(PageDownloader.class);
-
-
 	static PageParser pageParser;
 
 	@BeforeAll
 	static void setUp() {
 		pageParser = new PageParser(pageDownloader, new ObjectMapper());
-		String pageContent = loadPageContent();
+		String pageContent = TestUtils.loadPageContent();
 		Mockito.when(pageDownloader.retrievePageContent()).thenReturn(pageContent);
 	}
 
@@ -60,30 +57,19 @@ class PageParserTest {
 
 	@Test
 	void retrieveLetters() {
-		final List<Letter> letters = pageParser.retrieveLetters();
+		final List<Tile> tiles = pageParser.retrieveLetters();
 
-		Assertions.assertEquals(12, letters.size());
+		Assertions.assertEquals(12, tiles.size());
 
-		assertLetter("V", letters.get(0));
-		assertLetter("F", letters.get(1));
-		assertLetter("I", letters.get(11));
+		assertLetter("V", tiles.get(0));
+		assertLetter("F", tiles.get(1));
+		assertLetter("I", tiles.get(11));
 	}
 
-	private static void assertLetter(String V, Letter letter) {
-		Assertions.assertEquals(V, letter.getLetter());
-		Assertions.assertEquals(1, letter.getValue());
-		Assertions.assertEquals(0, letter.getUsageCount());
-		Assertions.assertFalse(letter.isSelected());
-	}
-
-	private static String loadPageContent() {
-		final ClassPathResource pageResource = new ClassPathResource("/slovosled-page-cache.html");
-		try (BufferedReader reader = new BufferedReader(new FileReader(pageResource.getFile()))) {
-			return reader.lines()
-						 .collect(Collectors.joining());
-
-		} catch (Exception ex) {
-			throw new RuntimeException("Unable to read page from cache", ex);
-		}
+	private static void assertLetter(String V, Tile tile) {
+		Assertions.assertEquals(V, tile.getLetter());
+		Assertions.assertEquals(1, tile.getValue());
+		Assertions.assertEquals(0, tile.getUsageCount());
+		Assertions.assertFalse(tile.isSelected());
 	}
 }

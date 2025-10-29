@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import sk.thenoen.slovosledsolver.model.Letter;
+import sk.thenoen.slovosledsolver.model.Tile;
 
 @Component
 public class PageParser {
@@ -40,7 +40,7 @@ public class PageParser {
 		return parseGrid(pageContent);
 	}
 
-	public List<Letter> retrieveLetters() {
+	public List<Tile> retrieveLetters() {
 
 		final String pageContent = pageDownloader.retrievePageContent();
 
@@ -50,17 +50,14 @@ public class PageParser {
 
 		final String group = matcher.group(1);
 
-		Letter[] letters;
+		Tile[] tiles;
 		try {
-			 letters = objectMapper.readerForArrayOf(Letter.class).readValue(group);
+			tiles = objectMapper.readerForArrayOf(Tile.class).readValue(group);
 		} catch (JsonProcessingException e) {
 			throw new RuntimeException(e);
 		}
 
-//		final ArrayList<Letter> letters = new ArrayList<>();
-
-
-		return List.of(letters);
+		return List.of(tiles);
 	}
 
 	private static List<String> parseGrid(String content) {

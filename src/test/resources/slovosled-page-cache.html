@@ -1,0 +1,1230 @@
+<!DOCTYPE html>
+<html lang="sk">
+
+<head>
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+                new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+            j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+            'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+        })(window,document,'script','dataLayer','GTM-KTD9WPKB');</script>
+    <!-- End Google Tag Manager -->
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Slovosleď</title>
+
+    <!-- AlpineJS -->
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.12.0/dist/cdn.min.js" defer></script>
+
+            <link rel="preload" as="style" href="https://slovosled.dennikn.sk/build/assets/app-vHohwYP7.css" /><link rel="modulepreload" href="https://slovosled.dennikn.sk/build/assets/app-BspcI3De.js" /><link rel="stylesheet" href="https://slovosled.dennikn.sk/build/assets/app-vHohwYP7.css" /><script type="module" src="https://slovosled.dennikn.sk/build/assets/app-BspcI3De.js"></script>    
+    <link rel="icon" href="https://slovosled.dennikn.sk/images/icon.png">
+    
+
+    <meta name="csrf-token" content="3wxIL49ylisecrMy2eXGszaDO7Ed5dKVkKnwNjOf">
+
+    <!-- Open Graph Meta -->
+    <meta property="og:title" content="Slovosleď" />
+    <meta property="og:image" content="https://slovosled.dennikn.sk/images/og.png" />
+    <meta property="og:description"
+        content="Slovosleď – Denná slovná výzva
+Nájdi 5 slov – premýšľaj, kombinuj a otestuj svoju slovnú zásobu" />
+    <meta property="og:type" content="game" />
+    <meta property="og:url" content="https://slovosled.dennikn.sk" />
+    <meta property="og:image:width" content="640">
+    <meta property="og:image:height" content="320">
+
+    <!-- Web Application Manifest -->
+<link rel="manifest" href="https://slovosled.dennikn.sk/manifest.json">
+<!-- Chrome for Android theme color -->
+<meta name="theme-color" content="#436BE2">
+
+<!-- Add to homescreen for Chrome on Android -->
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="application-name" content="Slovosleď">
+<link rel="icon" sizes="1024x1024"
+    href="/images/ios/1024.png">
+
+<!-- Add to homescreen for Safari on iOS -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="Slovosleď">
+<link rel="apple-touch-icon" href="/images/ios/1024.png">
+
+
+
+
+<!-- Tile for Win8 -->
+<meta name="msapplication-TileColor" content="#ffffff">
+<meta name="msapplication-TileImage" content="/images/ios/1024.png">
+
+<script type="text/javascript">
+    // Initialize the service worker
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/serviceworker.js', {
+            scope: '.'
+        }).then(function(registration) {
+            // Registration was successful
+            console.log('Laravel PWA: ServiceWorker registration successful with scope: ', registration.scope);
+        }, function(err) {
+            // registration failed :(
+            console.log('Laravel PWA: ServiceWorker registration failed: ', err);
+        });
+    }
+</script>
+</head>
+
+<body class="bg-[#436BE2] font-serif">
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KTD9WPKB"
+                      height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+
+    <!-- Main container with AlpineJS wordGame component -->
+    <div class="flex flex-col justify-between items-center w-full h-dvh" x-data="wordGame(initialGrid, initialHighscore, bonus, validWords, date)"
+        x-init="document.addEventListener('echo:ready', () => initEchoListeners())">
+
+        <!-- Score Display -->
+        <div class="pt-2 pb-1 px-4 w-full flex flex-col text-white max-w-sm">
+            <div class="flex justify-between items-center min-h-10 xs:min-h-12 sm:min-h-14">
+                <span class="font-bold text-[15px]/5 xs:text-base/5 mr-4" x-text="quote"></span>
+                <button @click="shareSocial()"
+                    class="cursor-pointer group focus:outline-none rounded-full h-fit
+           hover:bg-white/10 active:bg-white/20 transition-colors duration-150 xs:scale-125">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <g clip-path="url(#clip0_1405_249)">
+                            <path
+                                d="M12 0.521484C18.3275 0.521484 23.4785 5.6725 23.4785 12C23.4785 18.3275 18.3275 23.4785 12 23.4785C5.6725 23.4785 0.521484 18.3275 0.521484 12C0.521484 5.6725 5.6725 0.521484 12 0.521484Z"
+                                stroke="white" stroke-width="1.04348" />
+                            <path
+                                d="M18.2 11L13.4 7V9.4C9.86 9.4 7 12.26 7 15.8C7 16.35 7.08 16.89 7.21 17.4C7.92 14.64 10.42 12.6 13.4 12.6V15L18.2 11Z"
+                                fill="white" />
+                        </g>
+                        <defs>
+                            <clipPath id="clip0_1405_249">
+                                <rect width="24" height="24" fill="white" />
+                            </clipPath>
+                        </defs>
+                    </svg>
+                </button>
+            </div>
+            <div class="flex items-center space-x-1 font-sans text-[9px] xs:text-xs">
+                <span class="text-[#CDEFFF]">SKÓRE DŇA: </span>
+                <span class="font-bold " x-text="globalHighscore"></span>
+                <span class="text-[#CDEFFF]">/ VAŠE SKÓRE: </span>
+                <span class="font-extrabold text-[23px] xs:text-3xl" x-text="score"></span>
+            </div>
+        </div>
+
+        <div class="w-full h-5 bg-repeat-x bg-top"
+            style="background-image: url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2238%22 height=%2220%22><path d=%22M-1,-1 a22,20 0 0,0 40,0%22 fill=%22none%22 stroke=%22%23CDEFFF%22 stroke-width=%222%22/></svg>');">
+        </div>
+
+        <!-- Controls and Grid -->
+        <div class="lg:mt-6 xs:mt-2 flex flex-col items-center max-w-sm px-4"
+            x-show="submittedWords.size == 5 || gameTimeout">
+            <svg width="156" height="222" viewBox="0 0 156 222" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <g clip-path="url(#clip0_1405_265)">
+                    <path
+                        d="M56.2357 73.211V108.516L45.7598 112.376L45.8432 73.211L30.4336 79.4186L52.652 38.9062L70.2118 79.4186L56.2357 73.211Z"
+                        fill="#CDEFFF" stroke="black" stroke-width="2.5" />
+                    <path
+                        d="M32.8319 113.137L78.0207 69.1377L95.8282 79.6862L78.0346 117.668L126.493 144.807L121.517 183.267L62.3834 210.208L47.3123 187.202L91.1312 150.76L78.0346 161.41L45.8495 140.389L32.8319 113.137Z"
+                        fill="#F5A8A8" stroke="black" stroke-width="2.5" />
+                    <path
+                        d="M110.449 88.125L78.9985 49.4242L76.9528 6L104.5 2.5L99.6836 46.8105L132.509 92.0825L84.2199 133.126L59.9648 117.656L69.5273 104.532L82.3735 115.406L110.449 88.125Z"
+                        fill="#CDEFFF" />
+                    <path d="M70 104.5V98" stroke="black" stroke-width="2.5" />
+                    <path d="M60.5 118H50" stroke="black" stroke-width="2.5" />
+                    <path d="M68 184L65.5 198.5M59.5 190L75 192" stroke="black" stroke-width="2.5" />
+                    <path
+                        d="M104.5 12L99.6836 46.8105L132.509 92.0825L84.2199 133.126L59.9648 117.656L69.5273 104.532L82.3735 115.406L110.449 88.125L78.9985 49.4242L76.5 0"
+                        stroke="black" stroke-width="2.5" />
+                </g>
+                <defs>
+                    <clipPath id="clip0_1405_265">
+                        <rect width="155.488" height="221.902" fill="white" />
+                    </clipPath>
+                </defs>
+            </svg>
+            <span class="font-bold text-[15px]/5 xs:text-base/5 text-white xs:mt-4 mt-2" x-show="gameTimeout">Na dnešnú
+                výzvu ti
+                už nezostal
+                čas.
+                Nezúfaj, po
+                polnoci príde nová sada písmen. Využi posledné sekundy a rozšír si slovnú zásobu s jedným z našich
+                článkov.</span>
+            <button x-show="!gameTimeout"
+                class="text-white font-sans cursor-pointer md:mt-12 xs:mt-8 mt-4 bg-[#292222] rounded-full px-7 py-2.5 text-lg font-semibold
+            transition-colors duration-150"
+                @click="resetGame()">
+                Začať znova
+            </button>
+            <button x-show="gameTimeout"
+                class="text-white font-sans cursor-pointer md:mt-12 xs:mt-8 mt-4 bg-[#292222] rounded-full px-7 py-2.5 text-lg font-semibold
+            transition-colors duration-150"
+                @click="location.reload()">
+                Začať znova
+            </button>
+        </div>
+        <div class="flex flex-col items-center lg:mt-6" x-show="submittedWords.size < 5 && !gameTimeout">
+            <div class="h-15 xs:scale-125 xs:mt-1 sm:mt-3 xs:h-16 w-full flex justify-center">
+                <div class="flex flex-col mb-1 absolute justify-between items-center">
+                    <svg width="31" height="19" viewBox="0 0 31 19" fill="none"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M16.0765 0.681641L30.9577 17.1572L5.18144 18.7516L0.929688 6.26206L8.37025 9.18514L5.18144 4.40192L16.0765 0.681641Z"
+                            fill="#292222" />
+                    </svg>
+                    <div class="flex justify-between h-9 items-center">
+                        <svg width="54" height="58" viewBox="0 0 54 58" fill="none"
+                            xmlns="http://www.w3.org/2000/svg" class="mt-2">
+                            <g clip-path="url(#clip0_1403_175)">
+                                <path
+                                    d="M35.5703 13.357L52.6154 7.24514L53.9439 41.5249L44.5483 34.0843L36.9371 30.8955L22.5874 48.1682L4.66918 58.0004L5.84615 35.413L23.9161 24.2521L5.84615 21.8605L0 0.0703125L19.2846 3.25912L35.5703 13.357Z"
+                                    fill="#292222" />
+                            </g>
+                            <defs>
+                                <clipPath id="clip0_1403_175">
+                                    <rect width="53.9439" height="57.9301" fill="white"
+                                        transform="translate(0 0.0703125)" />
+                                </clipPath>
+                            </defs>
+                        </svg>
+                        <div class="flex flex-col grow justify-start leading-6 min-w-19 font-[450]">
+                            <div class="bg-[#292222] text-white text-2xl/6 text-center tracking-[0.3em] py-1.5 pl-1 -pr-0.5 h-9"
+                                :class="{ 'animate-place': animateInput }">
+                                <span id="selected-word" x-text="selectedWord"></span>
+                            </div>
+                        </div>
+                        <svg width="45" height="37" viewBox="0 0 45 37" fill="none"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <g clip-path="url(#clip0_1403_170)">
+                                <path
+                                    d="M44.7915 4.96572L42.6656 4.43426L39.7425 8.95174L35.7565 13.4692L28.5817 19.0496L27.7845 18.2524L35.7565 11.3433L40.274 4.96572V4.16852L2.53972 0.448242L0.945312 36.0566L15.4278 31.9378L34.1621 19.5811L44.7915 4.96572Z"
+                                    fill="#292222" />
+                                <path
+                                    d="M18.4851 13.6011L12.1074 16.3913L8.12142 13.2911L7.32422 8.95075L10.513 5.85052L14.2333 5.23047V6.78059L11.3102 7.40063L9.18436 9.5708L10.2473 12.671L13.4361 13.2911L15.8277 11.4309L14.2333 8.95075L15.8277 7.09061L18.4851 13.6011Z"
+                                    fill="#D9D9D9" />
+                            </g>
+                            <defs>
+                                <clipPath id="clip0_1403_170">
+                                    <rect width="43.8462" height="35.6084" fill="white"
+                                        transform="translate(0.945312 0.448242)" />
+                                </clipPath>
+                            </defs>
+                        </svg>
+                    </div>
+                    <svg width="12" height="11" viewBox="0 0 12 11" fill="none"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path d="M5.54515 10.3184L11.657 0.751953L0.230469 7.66104L5.54515 10.3184Z" fill="#292222" />
+                    </svg>
+                </div>
+            </div>
+            <div class="flex items-end justify-center w-full h-10 mb-2 sm:mb-4 text-white">
+                <div class="w-8 flex items-end justify-end">
+                    <button id="reset" @click="resetWord()" x-show="selectedWord.length > 0"
+                        class=" cursor-pointer text-center xs:scale-125">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <g clip-path="url(#clip0_1405_247)">
+                                <path
+                                    d="M12 0.5C18.3513 0.5 23.5 5.64873 23.5 12C23.5 18.3513 18.3513 23.5 12 23.5C5.64873 23.5 0.5 18.3513 0.5 12C0.5 5.64873 5.64873 0.5 12 0.5Z"
+                                    stroke="white" stroke-miterlimit="10" />
+                                <path d="M7 7L17 17" stroke="white" stroke-width="2.2" stroke-miterlimit="10" />
+                                <path d="M17 7L7 17" stroke="white" stroke-width="2.2" stroke-miterlimit="10" />
+                            </g>
+                            <defs>
+                                <clipPath id="clip0_1405_247">
+                                    <rect width="24" height="24" fill="white" />
+                                </clipPath>
+                            </defs>
+                        </svg>
+                    </button>
+                </div>
+                <span class="text-[#CDEFFF] w-28 xs:w-33 font-sans text-center text-[13px] xs:text-base"
+                    x-html="message"></span>
+                <div class="w-8 flex items-end justify-start">
+                    <button id="submit-word" @click="validateSelectedWord()"
+                        class="cursor-pointer text-center xs:scale-125" x-show="selectedWord.length > 2">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <g clip-path="url(#clip0_1405_250)">
+                                <path d="M5.87109 11.0599L10.5844 15.7732L18.1244 8.22656" stroke="white"
+                                    stroke-width="2.2" stroke-miterlimit="10" />
+                                <path
+                                    d="M12 0.5C18.3513 0.5 23.5 5.64873 23.5 12C23.5 18.3513 18.3513 23.5 12 23.5C5.64873 23.5 0.5 18.3513 0.5 12C0.5 5.64873 5.64873 0.5 12 0.5Z"
+                                    stroke="white" stroke-miterlimit="10" />
+                            </g>
+                            <defs>
+                                <clipPath id="clip0_1405_250">
+                                    <rect width="24" height="24" fill="white" />
+                                </clipPath>
+                            </defs>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <!-- Grid -->
+            <div id="grid" class="grid grid-cols-4 gap-y-1 gap-x-4 sm:gap-y-2 mb-1 sm:mb-8">
+                <template x-for="(cell, index) in gridCells" :key="index">
+                    <div class="relative w-fit flex flex-col items-center transform-3d active:-rotate-x-6 active:scale-95"
+                        @click="handleCellClick(index); if (navigator.vibrate) navigator.vibrate(10)"
+                        @mousedown="isActive = true" @mouseup="isActive = false"
+                        @touchstart.passive="isActive = true" x-data="{ isActive: false }">
+                        <div class="h-2 xs:h-3 bg-black w-1.5 xs:w-2"></div>
+                        <div class="w-13 h-13 xs:w-15 xs:h-14 sm:h-15 flex flex-col rounded-t-full cursor-pointer transition duration-100 relative
+            hover:brightness-98 active:brightness-90"
+                            :class="{
+                                'bg-[#7c53f2] text-white': cell.final,
+                                'bg-gray-200': cell.selected && !cell.final,
+                                'bg-[#d9ffff]': !cell.selected && !cell.final
+                            }">
+                            <span
+                                class="flex justify-center items-end text-[30px]/9 xs:text-4xl rounded-t-full grow border-[2px] xs:border-2 border-b-4 xs:border-b-5 border-black"
+                                x-text="cell.tile"
+                                :class="{
+                                    'bg-white text-black': cell.final,
+                                    'bg-[#AE0D21] text-white': cell.value === 1 && !cell.final,
+                                    'bg-[#C6841A] text-white': cell.value === 2 && !cell.final,
+                                    'bg-[#359B5E] text-white': cell.value === 3 && !cell.final
+                                }">
+                            </span>
+                        </div>
+                        <div class="w-13 xs:w-15 flex flex-col rounded-b-full">
+                            <span
+                                class="text-center text-2xl/4 xs:h-8 xs:text-3xl/4 pb-1.5 pt-1 font-bold rounded-b-full border-[2px] xs:border-2 border-black"
+                                x-text="cell.value"
+                                :class="{
+                                    'bg-[#766D6C] text-white': cell.final,
+                                    'bg-white text-[#AE0D21]': cell.value === 1 && !cell.final,
+                                    'bg-white text-[#C6841A]': cell.value === 2 && !cell.final,
+                                    'bg-white text-[#359B5E]': cell.value === 3 && !cell.final
+                                }">
+                        </div>
+                        <div x-show="cell.selected || isActive"
+                            x-transition:enter="transition-all duration-150 ease-out"
+                            x-transition:enter-start="opacity-0 scale-y-75"
+                            x-transition:enter-end="opacity-100 scale-y-100"
+                            x-transition:leave="transition-all duration-150 ease-in"
+                            x-transition:leave-start="opacity-100 scale-y-100"
+                            x-transition:leave-end="opacity-0 scale-y-75"
+                            class="absolute w-full bg-[#436BE2D9]/85 origin-bottom pointer-events-none bottom-0 transition-[height] duration-150 ease-in-out animate-submerge"
+                            :style="`height: ${isActive ? '1rem' : (cell.selected ? '4.5rem' : '0')}`">
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </div>
+
+        <!-- Bonus Container -->
+        <div id="bonus-container" class="flex flex-col items-center px-2 grow mt-2 font-sans w-xs xs:w-92">
+            <svg width="124" height="98" viewBox="0 0 124 98" fill="none"
+                xmlns="http://www.w3.org/2000/svg" class="absolute bottom-0 -z-10"
+                x-show="submittedWords.size == 5 || gameTimeout">
+                <g clip-path="url(#clip0_1405_266)">
+                    <mask id="mask0_1405_266" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="0" y="0"
+                        width="124" height="98">
+                        <rect width="124" height="98" fill="#D9D9D9" />
+                    </mask>
+                    <g mask="url(#mask0_1405_266)">
+                        <path
+                            d="M80.6079 4.86362L8.44808 89.3306L-4.99975 114.73L85.1841 126.672L104.481 84.5815L123.476 27.6996L119.948 26.182L108.61 50.175L100.141 61.2866L97.6853 60.8205L92.1985 31.6548L80.6079 4.86362Z"
+                            fill="#292222" />
+                        <path
+                            d="M68.8282 62.013L62.1077 76.2408L50.7114 76.8804L42.9055 70.6702L43.7327 60.6513L49.1497 54.0683L51.4525 56.7092L47.3936 62.1079L46.9957 68.9632L53.4121 72.666L59.7659 68.9852L61.0771 62.2634L54.6763 60.4065L54.6294 54.8689L68.8282 62.013Z"
+                            fill="white" />
+                    </g>
+                </g>
+                <defs>
+                    <clipPath id="clip0_1405_266">
+                        <rect width="124" height="98" fill="white" />
+                    </clipPath>
+                </defs>
+            </svg>
+            <div class="relative w-full text-[#292222] mb-2 py-0.5 flex items-center"
+                x-show="submittedWords.size < 5 && !gameTimeout">
+                <svg width="100%" height="100%" viewBox="0 0 291 40" fill="none" preserveAspectRatio="none"
+                    class="-z-10 absolute" xmlns="http://www.w3.org/2000/svg">
+                    <g clip-path="url(#clip0_1405_225)">
+                        <path
+                            d="M268.997 40L285.358 38L286.486 29.2L280.28 28.4L288.179 21L291 4L268.997 5.6L286.486 2.8V0L25.8329 0.8L1.57297 4L0 11.7391L7.34054 12.6087L2.0973 13.4783L1.57297 40H268.997Z"
+                            fill="#CDEFFF" />
+                    </g>
+                    <defs>
+                        <clipPath id="clip0_1405_225">
+                            <rect width="291" height="40" fill="white" />
+                        </clipPath>
+                    </defs>
+                </svg>
+                <div class="flex top-0 py-0.5 xs:py-1 px-2 items-center w-full">
+                    <div class="flex items-center justify-around pointer-events-none rounded-full xs:h-10 xs:w-38 min-w-16 px-2"
+                        :class="{
+                            'bg-white': bonusUnlocked,
+                            'bg-[#292222]': !bonusUnlocked,
+                        }">
+                        <svg width="22" height="28" viewBox="0 0 22 28" fill="none" class="xs:scale-150"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                :d="bonusUnlocked ?
+                                    'M4.1615 16.8051L10.7872 9.2932L10.7872 0L3.5669 0L5.3508 8.6736L-0.0008 18.2765L10.0829 27.501L18.3474 21.7836L18.3474 16.8051L22 18.2765L16.7334 8.6736L12.5711 18.2765L15.8839 16.8051L15.8839 19.2058L10.7872 23.8342L4.1615 16.8051' :
+                                    'M17.8385 16.8051L11.2128 9.29315V0H18.4331L16.6492 8.67361L22.0008 18.2765L11.9171 27.501L3.65264 21.7836V16.8051L0 18.2765L5.2666 8.67361L9.42891 18.2765L6.11605 16.8051V19.2058L11.2128 23.8342L17.8385 16.8051'"
+                                :fill="bonusUnlocked ? '#292222' : '#FFF'" />
+                        </svg>
+                        <div class="flex flex-col items-start justify-start xs:ml-1">
+                            <!-- Bonus pattern: 2x2 blocks -->
+                            <div class="flex space-x-0.5">
+                                <div class="w-2 h-2 xs:w-3 xs:h-3 rounded-xl"
+                                    :style="{ 'background-color': getBonusColor(bonus.pattern.charAt(0)) }"></div>
+                                <div class="w-2 h-2 xs:w-3 xs:h-3 rounded-xl"
+                                    :style="{ 'background-color': getBonusColor(bonus.pattern.charAt(1)) }"></div>
+                            </div>
+                            <div class="flex space-x-0.5 mt-0.5">
+                                <div class="w-2 h-2 xs:w-3 xs:h-3 rounded-xl"
+                                    :style="{ 'background-color': getBonusColor(bonus.pattern.charAt(2)) }"></div>
+                                <div class="w-2 h-2 xs:w-3 xs:h-3 rounded-xl"
+                                    :style="{ 'background-color': getBonusColor(bonus.pattern.charAt(3)) }"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-left mx-3 text-[13px]/4 xs:text-base/5">
+                        <span class="font-bold" x-text="'Bonus +' + bonus.value"></span>
+                        <span x-text="' bod' + (bonus.value > 4 ? 'ov' : 'y')"></span>
+                        <span x-html="bonus.text"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="flex grow items-end mb-4 w-full text-xs xs:text-base justify-between">
+                <button
+                    class="cursor-pointer text-white border border-white rounded-3xl py-1.5 px-3
+           hover:bg-white/10 active:bg-white/20 transition-colors duration-150"
+                    @click="rulesOpen = true; dataLayer.push({ event: 'tutorial_begin' })">
+                    Pravidlá
+                </button>
+
+                <button
+                    class="cursor-pointer text-white border border-white rounded-3xl py-1.5 px-3
+           hover:bg-white/10 active:bg-white/20 transition-colors duration-150"
+                    @click="wordsOpen = true">
+                    <span>Použité slová </span>
+                    <span class="font-bold" x-text="submittedWords.size + '/5'"></span>
+                </button>
+            </div>
+        </div>
+
+
+        <div x-show="wordsOpen" x-transition:enter="transform transition ease-in-out duration-300"
+            x-transition:enter-start="translate-y-full" x-transition:enter-end="translate-y-0"
+            x-transition:leave="transform transition ease-in-out duration-300"
+            x-transition:leave-start="translate-y-0" x-transition:leave-end="translate-y-full"
+            class="fixed bottom-0 left-0 w-full min-h-full shadow-xl py-6 bg-[#CDEFFF] flex flex-col items-center">
+            <div class="w-full flex flex-col items-center justify-between grow">
+                <div class="w-xs flex justify-between items-center">
+                    <span class="text-2xl text-left" x-html="'Použité slová  <b>'+submittedWords.size+'</b>/5'">
+                    </span>
+                    <button @click="wordsOpen = false"
+                        class="cursor-pointer group focus:outline-none rounded-full
+           hover:bg-black/5 active:bg-black/10 transition-colors duration-100">
+                        <svg width="26" height="26" viewBox="0 0 26 26" fill="none"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M13 25C19.6274 25 25 19.6274 25 13C25 6.37258 19.6274 1 13 1C6.37258 1 1 6.37258 1 13C1 19.6274 6.37258 25 13 25Z"
+                                stroke="#292222" stroke-miterlimit="10" />
+                            <path d="M6 11L13.0711 18.0711L20.1421 11" stroke="#292222" />
+                        </svg>
+                    </button>
+                </div>
+                <div class="w-full h-4 bg-repeat-x bg-top mb-5 mt-2"
+                    style="background-image: url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2238%22 height=%2220%22><path d=%22M-1,-1 a22,20 0 0,0 40,0%22 fill=%22none%22 stroke=%22%23FFFFFF%22 stroke-width=%222%22/></svg>');">
+                </div>
+                <ul class="w-full text-center space-y-4 grow text-xl">
+                    <template x-for="(word, index) in Array.from(submittedWords)" :key="word">
+                        <li class="h-16 w-full flex justify-center transform odd:scale-x-[-1]">
+                            <div class="h-16 w-full flex justify-center">
+                                <div class="flex flex-col mb-1 absolute justify-between items-center">
+                                    <svg width="31" height="19" viewBox="0 0 31 19" fill="none"
+                                        xmlns="http://www.w3.org/2000/svg">
+                                        <path
+                                            d="M16.0765 0.681641L30.9577 17.1572L5.18144 18.7516L0.929688 6.26206L8.37025 9.18514L5.18144 4.40192L16.0765 0.681641Z"
+                                            fill="#292222" />
+                                    </svg>
+                                    <div class="flex justify-between h-9 items-center">
+                                        <svg width="54" height="58" viewBox="0 0 54 58" fill="none"
+                                            xmlns="http://www.w3.org/2000/svg" class="mt-2">
+                                            <g clip-path="url(#clip0_1403_175)">
+                                                <path
+                                                    d="M35.5703 13.357L52.6154 7.24514L53.9439 41.5249L44.5483 34.0843L36.9371 30.8955L22.5874 48.1682L4.66918 58.0004L5.84615 35.413L23.9161 24.2521L5.84615 21.8605L0 0.0703125L19.2846 3.25912L35.5703 13.357Z"
+                                                    fill="#292222" />
+                                            </g>
+                                            <defs>
+                                                <clipPath id="clip0_1403_175">
+                                                    <rect width="53.9439" height="57.9301" fill="white"
+                                                        transform="translate(0 0.0703125)" />
+                                                </clipPath>
+                                            </defs>
+                                        </svg>
+                                        <div class="flex flex-col grow justify-start leading-6 min-w-18">
+                                            <div class="bg-[#292222] text-white text-2xl/6 text-center tracking-[0.3em] py-1.5 pl-1 -pr-0.5 h-9 transform"
+                                                :class="{ 'scale-x-[-1]': index % 2 }">
+                                                <span x-text="word"></span>
+                                            </div>
+                                        </div>
+                                        <svg width="45" height="37" viewBox="0 0 45 37" fill="none"
+                                            xmlns="http://www.w3.org/2000/svg">
+                                            <g clip-path="url(#clip0_1403_170)">
+                                                <path
+                                                    d="M44.7915 4.96572L42.6656 4.43426L39.7425 8.95174L35.7565 13.4692L28.5817 19.0496L27.7845 18.2524L35.7565 11.3433L40.274 4.96572V4.16852L2.53972 0.448242L0.945312 36.0566L15.4278 31.9378L34.1621 19.5811L44.7915 4.96572Z"
+                                                    fill="#292222" />
+                                                <path
+                                                    d="M18.4851 13.6011L12.1074 16.3913L8.12142 13.2911L7.32422 8.95075L10.513 5.85052L14.2333 5.23047V6.78059L11.3102 7.40063L9.18436 9.5708L10.2473 12.671L13.4361 13.2911L15.8277 11.4309L14.2333 8.95075L15.8277 7.09061L18.4851 13.6011Z"
+                                                    fill="#D9D9D9" />
+                                            </g>
+                                            <defs>
+                                                <clipPath id="clip0_1403_170">
+                                                    <rect width="43.8462" height="35.6084" fill="white"
+                                                        transform="translate(0.945312 0.448242)" />
+                                                </clipPath>
+                                            </defs>
+                                        </svg>
+                                    </div>
+                                    <svg width="12" height="11" viewBox="0 0 12 11" fill="none"
+                                        xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M5.54515 10.3184L11.657 0.751953L0.230469 7.66104L5.54515 10.3184Z"
+                                            fill="#292222" />
+                                    </svg>
+                                </div>
+                            </div>
+                        </li>
+                    </template>
+                </ul>
+                <button
+                    class="text-[#292222] font-sans cursor-pointer mb-8 border border-[#292222] rounded-full px-3 py-1.5 text-sm xs:text-base
+           hover:bg-[#2922220d] active:bg-[#29222214] transition-colors duration-150"
+                    @click="resetGame()">
+                    Začať hru znova
+                </button>
+            </div>
+        </div>
+
+        <!-- Rules Modal (Carousel) -->
+        <div x-cloak x-show="rulesOpen" x-transition:enter="transform transition ease-in-out duration-300"
+            x-transition:enter-start="translate-y-full" x-transition:enter-end="translate-y-0"
+            x-transition:leave="transform transition ease-in-out duration-300"
+            x-transition:leave-start="translate-y-0" x-transition:leave-end="translate-y-full"
+            class="fixed bottom-0 left-0 w-full min-h-full max-h-full shadow-xl py-6 bg-[#CDEFFF] flex flex-col items-center">
+            <div class="w-full flex flex-col items-center justify-between">
+                <div class="w-xs flex justify-between items-center">
+                    <span class="text-2xl text-left grow" x-html="'Pravidlá <b>'+( currentIndex+1 )+'</b>/4'">
+                    </span>
+                    <span class="flex items-center justify-between space-x-2">
+                        <button type="button" @click="prevItem()"
+                            class="cursor-pointer group focus:outline-none rounded-full
+           hover:bg-black/5 active:bg-black/10 transition-colors duration-100">
+                            <svg width="26" height="26" viewBox="0 0 26 26" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M13 1C6.37258 1 0.999998 6.37258 0.999999 13C1 19.6274 6.37258 25 13 25C19.6274 25 25 19.6274 25 13C25 6.37258 19.6274 1 13 1Z"
+                                    stroke="#292222" stroke-miterlimit="10" />
+                                <path d="M15 20L7.92893 12.9289L15 5.85787" stroke="#292222" />
+                            </svg>
+                            <span class="sr-only">Prev</span>
+                        </button>
+
+                        <button type="button" @click="nextItem()"
+                            class="cursor-pointer group focus:outline-none rounded-full
+           hover:bg-black/5 active:bg-black/10 transition-colors duration-100">
+                            <svg width="26" height="26" viewBox="0 0 26 26" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M13 25C19.6274 25 25 19.6274 25 13C25 6.37258 19.6274 1 13 1C6.37258 1 1 6.37258 1 13C1 19.6274 6.37258 25 13 25Z"
+                                    stroke="#292222" stroke-miterlimit="10" />
+                                <path d="M11 6L18.0711 13.0711L11 20.1421" stroke="#292222" />
+                            </svg>
+                            <span class="sr-only">Next</span>
+                        </button>
+                        <button
+                            @click="rulesOpen=false;localStorage.setItem('rulesShown', 'true');window.dataLayer.push({ event: 'tutorial_complete' })"
+                            class="text-black cursor-pointer group focus:outline-none rounded-full
+           hover:bg-black/5 active:bg-black/10 transition-colors duration-100">
+                            <svg width="26" height="26" viewBox="0 0 26 26" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M13 25C19.6274 25 25 19.6274 25 13C25 6.37258 19.6274 1 13 1C6.37258 1 1 6.37258 1 13C1 19.6274 6.37258 25 13 25Z"
+                                    stroke="#292222" stroke-miterlimit="10" />
+                                <path d="M6 11L13.0711 18.0711L20.1421 11" stroke="#292222" />
+                            </svg>
+
+                        </button>
+                    </span>
+                </div>
+                <div class="w-full h-4 bg-repeat-x bg-top mb-3 mt-2"
+                    style="background-image: url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2238%22 height=%2220%22><path d=%22M-1,-1 a22,20 0 0,0 40,0%22 fill=%22none%22 stroke=%22%23FFFFFF%22 stroke-width=%222%22/></svg>');">
+                </div>
+            </div>
+            <div class="w-xs flex flex-col items-start justify-between overflow-auto">
+                <div id="controls-carousel" class="relative w-full">
+                    <!-- Item 1 -->
+                    <div class="carousel-item active pb-1" data-index="0">
+                        <div class="flex flex-col">
+                            <span class="font-bold text-[19px]/6">Dosiahnite skóre dňa pomocou čo najlepšie zvolených
+                                piatich
+                                slov.</span>
+                            <span class="font-sans text-[13px]/4 mt-1.5">
+                                Slovo vytvoríte vyznačením písmen a body si pripíšete stlačením symbolu +.
+                            </span>
+                        </div>
+                        <div class="flex flex-col mt-2">
+                            <span class="font-bold text-[19px]/6">Ako sa počítajú body</span>
+                            <span class="font-sans text-[13px]/4 mt-1.5">Za každé slovo získate body podľa vzorca:
+                                (súčet hodnoty písmen) × počet písmen. V tomto prípade slovo ROB získava: (1+1+1) × 3 =
+                                9 bodov.</span>
+                        </div>
+                        <img src="/images/Tutorial_1.gif" alt="Tutorial animation 1">
+                        <div class="flex w-full items-center mt-3">
+                            <svg width="100%" height="40" viewBox="0 0 291 40" fill="none"
+                                preserveAspectRatio="none" class="-z-10" xmlns="http://www.w3.org/2000/svg">
+                                <g clip-path="url(#clip0_14fd5_225)">
+                                    <path
+                                        d="M268.997 40L285.358 38L286.486 29.2L280.28 28.4L288.179 21L291 4L268.997 5.6L286.486 2.8V0L25.8329 0.8L1.57297 4L0 11.7391L7.34054 12.6087L2.0973 13.4783L1.57297 40H268.997Z"
+                                        fill="#FFF" />
+                                </g>
+                                <defs>
+                                    <clipPath id="clip0_1405_225">
+                                        <rect width="291" height="40" fill="white" />
+                                    </clipPath>
+                                </defs>
+                            </svg>
+                            <div class="flex w-full items-center absolute px-1.5">
+                                <div class="min-w-14 flex justify-center items-center">
+                                    <div
+                                        class="rounded-full bg-black w-12 h-12 text-white font-bold font-sans text-[19px] flex items-center justify-center -m-4">
+                                        Tip
+                                    </div>
+                                </div>
+                                <span class="text-left ml-2 mr-5 text-xs/4 font-sans font-bold">
+                                    Čím dlhšie slovo nájdete, tým viac bodov získate.</span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Item 2 -->
+                    <div class="carousel-item pb-1" data-index="1">
+                        <div class="flex flex-col">
+                            <span class="font-bold text-[19px]/6">Hodnoty písmen</span>
+
+                            <span class="font-sans text-[13px]/5 mt-1.5">
+                                Hodnota písmena sa zmení po jeho použití v slove.</span>
+                        </div>
+                        <img src="/images/Tutorial_2.gif" alt="Tutorial animation 2" loading="lazy">
+                        <div class="flex flex-col">
+                            <span class="font-sans text-[13px]/4 mt-1.5">V tomto prípade slovo ROTA získava:</span>
+                            <span class="font-sans text-[13px]/4 font-bold">(2+3+1+1) × 4 = 28 bodov</span>
+                        </div>
+                        <div class="flex w-full items-center mt-3">
+                            <svg width="100%" height="40" viewBox="0 0 291 40" fill="none"
+                                preserveAspectRatio="none" class="-z-10" xmlns="http://www.w3.org/2000/svg">
+                                <g clip-path="url(#clip0_1405_225)">
+                                    <path
+                                        d="M268.997 40L285.358 38L286.486 29.2L280.28 28.4L288.179 21L291 4L268.997 5.6L286.486 2.8V0L25.8329 0.8L1.57297 4L0 11.7391L7.34054 12.6087L2.0973 13.4783L1.57297 40H268.997Z"
+                                        fill="#FFF" />
+                                </g>
+                                <defs>
+                                    <clipPath id="clip0_1405_225">
+                                        <rect width="291" height="40" fill="white" />
+                                    </clipPath>
+                                </defs>
+                            </svg>
+                            <div class="flex w-full items-center absolute px-1.5">
+                                <div class="min-w-14 flex justify-center items-center">
+                                    <div
+                                        class="rounded-full bg-black w-12 h-12 text-white font-bold font-sans text-[19px] flex items-center justify-center -m-4">
+                                        Tip
+                                    </div>
+                                </div>
+                                <span class="text-left ml-2 mr-5 text-xs/4 font-sans font-bold">Písmená s konečnou
+                                    hodnotou môžete stále použiť</span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Item 3 -->
+                    <div class="carousel-item pb-1" data-index="2">
+                        <div class="flex flex-col">
+                            <span class="font-bold text-[19px]/6">Bonusový efekt</span>
+
+                            <span class="font-sans text-[13px]/4 mt-1.5">V spodnej časti nájdete efekt, ktorý vám môže
+                                priniesť extra body.</span>
+                        </div>
+                        <div class="flex flex-col">
+                            <span class="font-sans text-[13px]/4 mt-1.5"><b>Bonus sa odomkne automaticky</b> po splnení
+                                podmienky – hodnoty písmen (farby písmen) musia zodpovedať kombinácii (farbám) na
+                                zámku.</span>
+                        </div>
+                        <img src="/images/Tutorial_3.gif" alt="Tutorial animation 3" loading="lazy">
+                        <div class="flex w-full items-center mt-3 h-14">
+                            <svg width="100%" height="100%" viewBox="0 0 291 40" fill="none"
+                                preserveAspectRatio="none" class="-z-10" xmlns="http://www.w3.org/2000/svg">
+                                <g clip-path="url(#clip0_1405_225)">
+                                    <path
+                                        d="M268.997 40L285.358 38L286.486 29.2L280.28 28.4L288.179 21L291 4L268.997 5.6L286.486 2.8V0L25.8329 0.8L1.57297 4L0 11.7391L7.34054 12.6087L2.0973 13.4783L1.57297 40H268.997Z"
+                                        fill="#FFF" />
+                                </g>
+                                <defs>
+                                    <clipPath id="clip0_1405_225">
+                                        <rect width="291" height="40" fill="white" />
+                                    </clipPath>
+                                </defs>
+                            </svg>
+                            <div class="flex w-full items-center absolute px-1.5">
+                                <div class="min-w-14 flex justify-center items-center">
+                                    <div
+                                        class="rounded-full bg-black w-12 h-12 text-white font-bold font-sans text-[19px] flex items-center justify-center -m-4">
+                                        Tip
+                                    </div>
+                                </div>
+                                <span class="text-left ml-2 mr-5 text-xs/4 font-sans font-bold">Odomknite bonus čo
+                                    najskôr – nezáleží, kde na ploche sa potrebná kombinácia objaví.</span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Item 4 -->
+                    <div class="carousel-item pb-1" data-index="3">
+                        <div class="flex flex-col mt-18">
+                            <span class="font-bold text-[19px]/6">Pravidlá prípustných slov</span>
+
+                            <span class="font-sans text-[13px]/4 mt-3"><b>V hre nie sú povolené:</b> vulgarizmy,
+                                jednopísmenové a dvojpísmenové výrazy, značky, citoslovcia. <b>Povolené sú</b> všetky
+                                tvary slov, teda aj v množnom čísle, vyskloňované a vyčasované.</span>
+                        </div>
+                        <div class="flex flex-col mt-5">
+                            <span class="font-bold text-[19px]/6">Každý deň vás tu čaká nová
+                                kombinácia písmen a nová výzva na čo najlepšie využitie slov. </span>
+                            <span class="font-sans text-[13px]/4 mt-5">Prajeme vám príjemnú zábavu. </span>
+                        </div>
+                        <div class="flex w-full items-center mt-3 h-14">
+                            <svg width="100%" height="100%" viewBox="0 0 291 40" fill="none"
+                                preserveAspectRatio="none" class="-z-10" xmlns="http://www.w3.org/2000/svg">
+                                <g clip-path="url(#clip0_1405_225)">
+                                    <path
+                                        d="M268.997 40L285.358 38L286.486 29.2L280.28 28.4L288.179 21L291 4L268.997 5.6L286.486 2.8V0L25.8329 0.8L1.57297 4L0 11.7391L7.34054 12.6087L2.0973 13.4783L1.57297 40H268.997Z"
+                                        fill="#FFF" />
+                                </g>
+                                <defs>
+                                    <clipPath id="clip0_1405_225">
+                                        <rect width="291" height="40" fill="white" />
+                                    </clipPath>
+                                </defs>
+                            </svg>
+                            <div class="flex w-full items-center absolute px-1.5">
+                                <div class="min-w-14 flex justify-center items-center">
+                                    <div
+                                        class="rounded-full bg-black w-12 h-12 text-white font-bold font-sans text-[19px] flex items-center justify-center -m-4">
+                                        Tip
+                                    </div>
+                                </div>
+                                <span class="text-left ml-2 mr-5 text-xs/4 font-sans font-bold">Odomknite bonus čo
+                                    najskôr – nezáleží, kde na ploche sa potrebná kombinácia objaví.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Initialization Data -->
+    <script>
+        window.initialGrid = [{"letter":"V","value":1,"usageCount":0,"selected":false},{"letter":"F","value":1,"usageCount":0,"selected":false},{"letter":"E","value":1,"usageCount":0,"selected":false},{"letter":"L","value":1,"usageCount":0,"selected":false},{"letter":"U","value":1,"usageCount":0,"selected":false},{"letter":"Y","value":1,"usageCount":0,"selected":false},{"letter":"P","value":1,"usageCount":0,"selected":false},{"letter":"\u0160","value":1,"usageCount":0,"selected":false},{"letter":"U","value":1,"usageCount":0,"selected":false},{"letter":"A","value":1,"usageCount":0,"selected":false},{"letter":"H","value":1,"usageCount":0,"selected":false},{"letter":"I","value":1,"usageCount":0,"selected":false}];
+        window.initialHighscore = 410;
+        window.bonus = {"pattern":"2022","value":3,"text":"za ka\u017ed\u00fa samohl\u00e1sku v slove","index":2};
+        window.validWords = "[\u0022df0ccd8a95222a27ee44783ceea02ddb1d2a660b1983e57bf487fff179a5542e\u0022, \u0022b6c5a649e1dcef47f0dd9dc0ca9adbd18e91410c38eb9d6d277303a26ed11933\u0022, \u00223d5b25960d5ea2abc28330ad7a50033e6e524e9e369ad833bb695c514f2915ec\u0022, \u0022361d3bb4330d7ca8d89534357e6e3b0314976f109646bccac9f42c0a856438fe\u0022, \u0022b24a868593dba8e7c828376c93d080c16ff7a29831af3377fbab149270e330d3\u0022, \u002266addb553b69f9515a9aa71b487a6067016ac0622078cbb74ec6191bcd7c87dc\u0022, \u0022f33fa6d1642a3152ffe7fbba854b680a331afb652c0b524740675409a388e16b\u0022, \u00226fd43511057862b6c06a06dad64fd0057b4ac036bb2d96069fe242fe99a3e405\u0022, \u0022879ed13b12df759833609c84082b3c50a18ac577349faeed33ea2571e35eb245\u0022, \u0022d77e6f08789f846bbb5f3e633fc453cd6108d5e471863c2d565806f5c42778d9\u0022, \u002278e68cc09732362f203dbdc3601e333585d416b92d423f00c31264a43f1a243d\u0022, \u002214a0492137b97a38945e4ae5253a659df9b330c699f0c30771d82c11cb09fd60\u0022, \u0022e5c8d7e0ecc861f7281260c49ba72e99d4528cf482d3b816d0d6013d26dafc44\u0022, \u00224d69bb4dd20d7d6ff5ae6621c193ab46dd6ace26f4331e0c41c0d69bc627775f\u0022, \u0022e305d58026b712ca7ce9681beb3a0d7005df50e3d329a886c4fd4b265b80c491\u0022, \u0022ba71a268b1775087a79d10500838749abb95e8f2b1f901f85b0b33c3f40e2cfc\u0022, \u0022db07b2d4d4126caf220f3b1da25b3c11352c56f095b7c45533d66371f1dce6d0\u0022, \u002218178686da8a958d3a559285d902bec44ddd04bfc6773eb27b763671e9f318d7\u0022, \u0022ca423763253105adafb82bf1a97d9774c3d835c1f92dbfe402fc460fdffc58ac\u0022, \u002283aa8c650d5f9a424b5a582ca94e5dcd8dab28cb6db041eaf7b71693190aed38\u0022, \u0022fe6b53bd58601d8dc3e190c82695c412a085d6937538d61ace442f111484c0ef\u0022, \u00223eadaad2ef5693d817af99870eb65f0f9b4c1f44fd200541314168a037dc897e\u0022, \u0022eb27484d77657b442cf035c002ed4ef1313eb0ed3e0bad98344d3f90a8c5369a\u0022, \u0022a357c730fef3c125247017e0f478715af2aa7645d09c036404922ceabf810ce3\u0022, \u002241d6f1811b5c3ac68f905a6052f0852f1a5b811998c734fdbd81251602b495d4\u0022, \u002227df1091dcf60ad45734a1575a88cd3f59a24c61dfcfadaca517cca99d50a796\u0022, \u0022bef777b0eb0a6a971939f4c82b3d15b3aa633d97fb3276002a36e2e2dfdcd93e\u0022, \u0022667880baddf02c5cc5b3af76df777421529df4b9cd77c3d413629956084c3d89\u0022, \u0022d411d8e8df2fc648d0cf6114bb451ff8ca2d51c49cd6ea49db64292f60962245\u0022, \u002274a21ab613fb4285256ac3975366b45d8805505cb88ca330c584e8861a0ee810\u0022, \u00229d47885c6d4556f114ca5c42d6611f0827dc4106d88271f912494b9b6c84b38b\u0022, \u0022bc30cc2d24810bd6b68f350248964f2bb3382388f140c61c323796c7545dd5fd\u0022, \u0022160d39cfc93cf0a6a82adf0700a42846a9841fff38b8090fffeaa4d194a5b8c0\u0022, \u0022c9609c5e8871d4bcf524d5fca4f587a156f25f3120b418cdf7a5f9289c8da29e\u0022, \u0022706abe3c90152075e656b661079730facf323f3ebccda7547ee1935c90845a09\u0022, \u002219e38b73cf94d9c65641c2a67fc1fd503f8ece24e47b729cd925f1783ed22c77\u0022, \u00229dda34f53a8c6af1444ed5d848393964892c3944623b4383c43eed487d711ff4\u0022, \u00222e53efe8a2f902bf44003e92331fefb0e7b07d48cdf05e70081b348370b885b3\u0022, \u00222fa90c0e3ffe917153a1536c982b2dfef511a79a798396234430c7fc17931c13\u0022, \u0022b30bbb7924ddac9a90ee9deea51ea20b032203faa7465084574d0cba921f3ffd\u0022, \u00225517bab653668facef67e08f959d3af9f63e80a0570411d1f4f7c6b0460bc24e\u0022, \u002219fb643c74f3575c33994f3d159ad3b5f68f2ada94403d0aeefc977d9a1bc1ac\u0022, \u00224831825c7fb9a723e445dc7703c6a7d1f1876aa24ee4a84b254104c5358da84f\u0022, \u0022bcfe147a2ba1fbb1f96b29db18352d47fb72eade73dfd8ab775c1a7046e5d6c1\u0022, \u0022d620d58ea4d7b1f0e7cd17b1e1dedf4f1b236fd4387416c4a6d2ea696cb2b29c\u0022, \u0022bc76dfe3827fef55c306e16823a34fdc70404e7241c830f229c57d6194f0b904\u0022, \u0022afcfb41e2a173a6069b337c68c175daf8673284dfe974858731e1040354bbdde\u0022, \u0022a28388c952393cf2a6852998d50577e70d8ee6938261cf981d6c70836e45f10c\u0022, \u0022f55e00ecbfd331315d326742d5711f1bff656296da43dbc2f1624ea92ce61ab2\u0022, \u00223067727e766ed3bdb2c8d0df89a522d39a402caf39b9bd514221dcba6fe02a0c\u0022, \u0022e0097c2047eef4a38d49f607f921dde0d5831a76a3a46c6a60d8995b6ce2ccd7\u0022, \u0022c73a202c281bf704018ce8ad01757b81de7892d874b489413782b07ac3dcdece\u0022, \u00228d03267b6ceac0a1891928ed4ff030b4dca4a691fc5a33557e17a0781a9fa81d\u0022, \u0022f955a1c8f9609037228198a1119f9ab6ccdf1757cb6d72523b9687440e59e39b\u0022, \u00226df3e2c88d27fe9cc867133c21fd171a37b24b9f05a315cb1051fcdb9e2dcee6\u0022, \u0022b89b6a446026dc36b169120993e4361cfb8789d1e6101d51a211c84fa7385286\u0022, \u002270da6d89f5c701b8573b2334f970c666fb57cc32f1e61da48f55a28772416821\u0022, \u002247d2e1d40a144d62a70d10e9a196adb229511d3c96257be3cd90caa6f7b6529f\u0022, \u0022342173ef8a9e28ff170e48573f05808c313aa61c248ec40a1a222aabe336b51c\u0022, \u0022e8cc7d2289b103ce0697a4d40be861ed064bc6c9fda8fa57375cda2641da20e1\u0022, \u0022673dfe65f010e8630bcdd09ef583c82deed87b935e6653197009a38addcc6dd7\u0022, \u0022c71f80fe86de575b97770e645fcdda5ba0dcbf54b52a1bcffdbfb8b2ac855ad4\u0022, \u00229b73732fbe30f014764e7aecee3c820391c42a52b6d396949d23fa2235f72b13\u0022, \u00229ef2faffd23e7fdda264eeeb3114357fcb304142506cbb023c2894ac10f71654\u0022, \u0022386e523db7882d494f1904cafdf63f8a099eff226bf2a8918934fbb97f345c65\u0022, \u002271f85e67a8f330bceb32057581b450710ce96fdcb1d04649e20256e7090298c9\u0022, \u00229be9f6bc3988f45978d290fbb425405dd1454686235831db9784a3be5b64ba74\u0022, \u0022c8250aae25c02ded399f4dc0b99c44d2de9690f4ed7590a4d68b6a896f9ef349\u0022, \u0022544edca671df11feb38a098c208d6fb228ced53fb54fd280526701b5c01d0c90\u0022, \u002257631801fd0a699e24ec5d580e4d8366757933dfe74a61ea661eb2a7c3b8dc2f\u0022, \u00221cbf676ce50ca031fdceffff25c3ade7ad4710b850a9ee926dce850226867d32\u0022, \u002288ebbe7e2bd716a03efc198234d58600121e0f76a06a3af4b2fab45a26d639f8\u0022, \u0022b06ac95be813547d40f98e4e2a4cd41954ee97ff0cba7a9e13ceaff16998cbb2\u0022, \u00223e1dd5d2b01d388093c38318fcf2dd1a204c42963a6e3cbf85508748695f5ca6\u0022, \u0022beeb710425a2849894c218a3903f16a5a3b770348034775880cd6091543427e3\u0022, \u0022f696f9afc2f13822e0091f46c92741e8f63607f9b892380a8e4d1323be265fcd\u0022, \u00229678f8b3c3b612fd4e3dcf2d57097a84aa49b532f4a37a423334a718237a6fc0\u0022, \u0022310fe5233497236c57da0356be1eeb3a4f0d1d3aa8daf8a54a4262d1119f93ba\u0022, \u0022c876e664a2495abc6b2be38e16ce4f711df018bd80e3b36d234d6a2d724fef23\u0022, \u0022306b7c24d75dcf81bc1c5a260131abf6c641f6756a2cd3de3e5a059d7308724e\u0022, \u0022a11694aefc1bef50993cb6b3acbf1fb74ab96b693ae44c2cd80b37a15c48f4e3\u0022, \u0022cf04f1999c2ee40d8f71e12006b40197087da7cfe9a6c4b248d901cfd0c931e6\u0022, \u002261f13e699c75587134415f7b1b583f72c0cde644d1fb9ef936018c018374aa59\u0022, \u00225bd304c7fa798a2470b7c75cb7f7562e97eb2300defe05833ee29d30c51b3e7f\u0022, \u0022b867a8bae572af859ca8bab58db55b4e67cb6d915c4f9d2edeb085a9be8523de\u0022, \u002260d5cafe1e67d1a138f1b0bcf954438f9b464fde0c82ab3afdce15930abd6a9a\u0022, \u0022c92569dad454acec0281438d6d8f19e9df089cbabdff9dc17f1ec59675530f11\u0022, \u00221ec4a2e5f4421b93eeb2e6eb43eb567bb8c8db501674d393d8857282c3193cc2\u0022, \u0022066c03a107ab6bdc64419f617269c13480ad724578fe9be2d0e9df17ff6d2b45\u0022, \u0022dad04162c72d20ef2553acd1632bc2db118ef65bcce08255da352ddf05dcf64b\u0022, \u0022214058ba87504d8fe1c25a16c5efacc9764c7c7cc7cd8400ea9c70593d4b1a1c\u0022, \u00221575a5ec4ba7eff6f2c9fbe413617895abdd9779e4e12712498cbe518fad7f93\u0022, \u0022c8d8f881fed7689a63d1feb63ccd845e792ed216b7f665dac1552e37cae4101d\u0022, \u0022830858f6b8e8333903df039b53922da3df160cdffd00de577790d90c5793819c\u0022, \u00229f677714b4c1cd061684da4835251fae5029a531c1e2f2fe13cafc632ca0c5b3\u0022, \u002237f7d502a41fc2c1a6ba4c4ffad2ce9b2630f0f5d1392450a715afd8779c6707\u0022, \u002231d84dc259f52aff5b97a56d44b108b8e1eb1e4297130da35a196bee3b1656f1\u0022, \u0022ca3952bf47384fde34d76b8d7e29fea0173f2192b617d569d69278947b4745dd\u0022, \u00228fa7e86384eefc875fe1003d57ea99dba2def2dbb9a52e5c7a89e2b30f20f2a1\u0022, \u00224a2296a54fea57c9770ed1c16e88eac9271b35f0484dd1deeae1ea07f2f7681a\u0022, \u0022ec6c6d80466a819bb0773fc8fb825bfbe2aafaf60a6e77602a6140534b13f9e2\u0022, \u0022b75ae1514e58f670b75cf8e0c2add9a4f0f3b43c0e97ccafeffca5965fbf00c5\u0022, \u0022923dbdd5fb2d15d8dcb8d02c47cc9f7b0ba479f90cfba97da3b30631ce89c998\u0022, \u0022d97d36fc2dc645d736f3ed30d476d41ca0208f5659be950f6e307f2c14595e74\u0022, \u002208c5d12a51d550be5a0b7f782ef4238ee1a2b88cdcf7a7ae489a161f73ef6870\u0022, \u002259f7784475bc73fab3828fbd69176746b74570840cfcbd83d54baa4885191819\u0022, \u002242c6335e66313f71d9fe3a5defa214148a2ee54b6386ff196ebb5f9c20264234\u0022, \u002294b6b246feafadeae6382025f35b50720b1a0ba6a58d50018553d1d96d4c85d2\u0022, \u002258f700cc65ce72cfb05362545799e20ecfe6e38f35c6cce70c75ef2cef5156bf\u0022, \u0022f11c0004bc149d907e49361824ba1153dadc606b6c549bdc415d9341ac2bb9df\u0022, \u0022553d5ce3b479b0c429408e78a6913804a9bba9af722a5ebb177a74919df708e4\u0022, \u0022951169adb6b5968fb38f0180aa37b97cddfbfed50145a21fc2494fb45fe021e9\u0022, \u00229388397eb6f8bc61fc2c4f60ddcfc1f1e69170c794fd42f5a914887eb6c3de31\u0022, \u0022fd6d943ba636ed0edba9fea54c0169c6a5d8172bee2d7a9f7d0945490dc9106b\u0022, \u0022f57141a72dd25d83e2c1e33ea6c7b43c66b6cd44cd4e0065e4201103cc9fc1a2\u0022, \u00225060e9e0b519e6df5228525a84d0a77fa03e18501345b6f64795dc2933a5b0d2\u0022, \u0022a0e47fb1c7a3826bc379c4ee238a0a777800c2396377d88f4459bee9daadbc79\u0022, \u0022721691d767a5cda39bd788be43061175af9fdc6f418135ebfe6ca364a7e6c01e\u0022, \u00225dd3b54c0f036c7685a1df5f257a5e214e66a70a8f858ca35ea66b88f3881412\u0022, \u0022f963136345ab82333a260d170e443a1c2559338abec76caed2c6d1ce260d2ea1\u0022, \u00225cf9351d5f4c632a62d0d07a12d51db28fa2ac2fc32ee64649c758eb022086f8\u0022, \u002298223ed5997d63a868febf09091443bb25e19b0777a6d4c9b1db6a5a272f7782\u0022, \u00226c7ed4c73cc260b4c7c962b84caec0325ee07235d93f6018bfa6c128021487d2\u0022, \u0022e526d847bc0f2fb22fab95cb30915d070e6ca4bc89cc937ae3ba74ba10e2946a\u0022, \u002232843bfec6939c9ce391f26c4b3564e540f0368037993894c5f4d0e355ead165\u0022, \u0022e7d0ab2dcc4f26a0d54840252c4b223df50cfec2a5996255136420ee21726f42\u0022, \u002239545247dd28869eef2abaa5dcea6e9deee7dcef6e5ebd2bdd5cc8649b78d8e2\u0022, \u002228e7ef3a7e544b992d9c4cfd10454eac1e73e54304e21e4a5a8725fc9594822b\u0022, \u0022779c638b3e510ff6d8965110920fc1e37a3d206dc796806b54469a5c8ec1aaeb\u0022, \u002225a34247cb45fe886367c3529f6f801b05a4367f0eaeb017ac558902b1771e89\u0022, \u0022daf765ee0b2b00c848d7725675ecba3e7e550c10a97a0931ef82f06513da75db\u0022, \u0022f27325b66d8ce654dfc1095061c3b397febfbc88d211cde35847f9dbf0b0d19b\u0022, \u0022ba6da46c5e1c647558bb8be67884e74bd5b679122083e584b7cef49bbda0319d\u0022, \u00221f0f7f587280b78f360e0f5ea1e369ff52d97f4c42ce995ec7801baf1d57aeba\u0022, \u00228385b36c83bb9d03c0d821a5a14ce4766f6da483917d3dff4ce4be896c6ea681\u0022, \u00224a3121427cabd513ab315d2e7529e7fd81150b8a47c6d3faf7272ed1f4bdb803\u0022, \u00229b1f7d19c9cb52ad8ee347213227913056b4a768d7b97cdcfcbccd47773011af\u0022, \u00225d65ec76b4b517e5b4cebdb7b1fb248c267db0b22b412f061796d6bf54f46f4d\u0022, \u0022c4356b7f4136bad32649aea79f819d4b048b897e70c44b985f21b33ae6042e88\u0022, \u0022c02880119afaba47d13c4b7e75d0b885eefc6875bc381d5892aebaad465f4bcd\u0022, \u0022682c0b08488ad8c4565380ece932e38372851e851a64332a2324af5319cf4dc7\u0022, \u0022d99e51c7d503f7c0c3d3e7edfad07829adc56a55045607d63c066aabfc7e9f97\u0022, \u00221336d28e0fd051a6b2e5592ca32ce1ae60ff330f944b730f6040337ce9634508\u0022, \u0022b7049b170d9719b00df97de6d14ee216a82919fbc042e9d93607bc44f371e44d\u0022, \u00222769085dee8be32b93b16a654598253854a2b7c9e1bc63f714217c147727bb68\u0022, \u00222c399c2d15bd0306763339972295f789e80807c88882b174982b8ef19ce8a32a\u0022, \u00220fbf5f77ed6ae52ca61cb04a5c51467655abac9e18d1ab68c9ef1dd7da342b20\u0022, \u002251a39d38ea6297ea038982df57082aa4fe582fa79199a7560edb0fe4a4b785ca\u0022, \u002254304bb0ab72d46f92b8bc7d1b537a0e0269a27de4e4df329f8c65dfc033eb2d\u0022, \u0022b43a5d9435cdd8e91894344dec3ef5cca5486ed1547ce02836c98fc2a01c7185\u0022, \u002299818d73ddd77dae1e234ab3fa64f8eddf7f8eff719f69c0bd1547890c1fd8a5\u0022, \u00221fff8d07d6abd49f867913804713736b5b6eae47ee3412678ac6376db87a4d83\u0022, \u0022bdcf93db41e61b186252cc9bb63975694f82fdb4f2d476b80c8a20f0bcf5a3f3\u0022, \u0022fe56e9fbb6db8f22c236a846bdc418d0a59a29e30dcae1b9a4a37d4e2296ae30\u0022, \u0022d955db73883da1122493d89c0428180c7a94afdb115049ccc05a92ed19f84a96\u0022, \u00228ed0b28ac347d0e9afc13a030a422d25507139d18615b416c16153503c72e712\u0022, \u0022e18d581ac5ad0d14d33bdf988634d9f6cc5f32f2934b84e165b787e014089c2f\u0022, \u002241a9c026d2a60281a0aa820dda77d2196be496020d34515f18571ba7faca31e0\u0022, \u0022682bfb109adea392aa69de31bc9a7986d93b9086c6ad608df88fea657ddd4640\u0022, \u00227f7e2d7173557b14ecd7ffdc40040a28a0c224b334829ff141844df31333ed6e\u0022, \u0022c2994c86dabcc388500f67149fc8438aa2107ed49528657dfffaad3637e0b2d1\u0022, \u002238f338eb0142f709885286c98b2d4bdeb8d459b1b90aa528c835a9b6b988c62c\u0022, \u00227c4b0e86680cf92c8b0ae5337b59ae1f16bcd262d125cedb4710ff7b6fe23d07\u0022, \u0022e53166fd1db97221227c53610fa15de5c4272cc3c4f9777fdbb3fa7e0b9e20e9\u0022, \u002217ac8a12c197457f95debac9d99875204771e6f9f2b94a5534b46f46d1107893\u0022, \u0022ee8d5670e94a74c3a9bff6b70385b53c02c7ddfde634fad16c4b402d1528db65\u0022, \u002257b45088462f22b4b8f1206246109356db415791dc4483833641c3aa9c1365e0\u0022, \u002296e9c786376d47487e772e6fa1fe623f7f16ede7fdbef2614748bc82e8a5b1d5\u0022, \u0022a16786e81914e39ca780b248dfaa6f8872b34636e4ef268b1f1c56e9ddbcff81\u0022, \u002250c75e1d7fe79e3988840a435eb9586549da650a86a8e180bb87c9fc0f2df5fa\u0022, \u0022ba7112ee28adf4d43699dbad25d7ff3cd8d816b5c8add839ff2b57fecdb23300\u0022, \u002208de1840e0bd69b5bb12ae6004a2cf1d644b53301711acc40642294c6a345b4e\u0022, \u00229d33ef8102794d87c7d17c7b8ab6f058724c7537750b50f1fa40c28c14257462\u0022, \u0022f65cb2dba1377229af20731dd7dcce3c1e118c7ba545294ba939d9e7e32bc9fa\u0022, \u00223218ca1be94d6ea35717b177d879c02f0ee890d9cc803d9c0d30ab082270d098\u0022, \u0022b97b5ab5f4180877306d084c4d988c9db0ca5c160a9a1af8128db0fd3fb33fd6\u0022, \u002235e0d0360a0af6d115f9df30e1b00b5b544ebf4bb93272aa02cd5d64b064a64b\u0022, \u0022a65c288753f238a5ea185c09d3607722ab2344fa906e356e7d218fce337b0714\u0022, \u00220c33b2c4faea3ae6122376da822b4d774dab74fa4190471b8ea76ba142303391\u0022, \u0022d0bba84b5a02653d9d79b6de5c31e41a5093c0b7ab01fe66892b3985a4fd74ff\u0022, \u0022bba3a144ea3ae1c33de13848ffbfefcada5f405905f5cc1fe1a711422a2824a7\u0022, \u0022ce045664fe56532eaa0cfab08c667769b4d148dd48284738b0d97b0a9976f768\u0022, \u00228b0e0f1b081327ba769b00b450ff3b59167fbead24a5ae34a7eea85de5992f03\u0022, \u0022710c2b85fea39dc77ebf832491fb532d01cb7e5c327cfab0caf4186849770622\u0022, \u0022c02561d250c125f4ab14c913c932739acd8f1d56193323cf07c202c0ca4cd5ec\u0022, \u0022889ee1a3948f066847fd75b8dbce10ca9469a5e94821abdb58681748428db3e3\u0022, \u0022cacac8057c447909662841ca76a45b2c7ddfbc9c2d6670854cfe6f1f0ba5873e\u0022, \u002206f16729d6b7422b832dc799dfd6e2ca36949ccd61108b3b06e3488aad4f551b\u0022, \u0022d2b2c3bf7774d14adcef938f9fde442eaae49a08a3eff4b18e69568678f34850\u0022, \u0022cd13fe50a740452e4934d4e819719fdfdf5397c10287ae605818923bf77c2160\u0022, \u00221233b61f70838276c97975605ebf3fad80853277bd1ce2cfb6ce370dc0aca4c0\u0022, \u002205662f7539697caf9770d59674cef50ba1f273a06dd8b6ee48e69e635c70d1f0\u0022, \u0022cddb512b062cc9719cd296763a44fda56ea31a6a40f12fcbcdae9f5b7b069ac3\u0022, \u0022e9c3e9be7a2c745d8b3edecdfb5be66a0e2cc64d7214e6c985432c514d2a6501\u0022, \u0022e3cf9ca2f0419e3523b19a4aa7bf7fb122ca83ce23801ff2ab508f0c6ec7f5a5\u0022, \u0022bbcf17d936fad15ebdc74ce980393fcf301fd4e13113566774a1ccc34f274a24\u0022, \u0022aa67b62aa233f3ef47c87c0684e62e4c48f190f9112ec82e64a5cac87ff21c00\u0022, \u0022f7b82be1c54a146cd680d988031417b8e4224853143533cd669953f3f69d6c3a\u0022, \u00220421ac277aa224d073284dca5f5aa8d536c7a02e6ecf195708cb3d7eca7f33bf\u0022, \u00223af7a4a6a676edd7c7eed578e84bf11be132334af8e814e8604f04b6a1c69718\u0022, \u0022f4c4b352ff8cb9027a82d3743a06e492e59dfe7f88e3eca4820f38f70a209ac6\u0022, \u0022f61458eeb7cfc17745bf3b45c89bfaff2f860c5d0cb9075e18a9feabac7276b1\u0022, \u0022a9255ec5ebe7554ab3ea9f50237dd8360fabfe7af334c50b6564c490b18ed6e4\u0022, \u0022f67d9095d39727979eb8114117ac33e37540ce6481c2deecff22407a0b97aa4c\u0022, \u00223f18849233e61181785d7e42d1acc3ba9486f97e7baf751825ca6cd35ab5cd51\u0022, \u00220cbd3574db10469ebdf2f44a21ff04dd5db3ceef30a98caffc20aca39491910f\u0022, \u00229a197172cfaf039890b03143f7de01006d154d9b0f8fc3d082d0847500e5e6c9\u0022, \u0022bd2b8f360d25fd975d9fced999a51203031fe5c99706e1aba574112369d43759\u0022, \u002273645c6d9f6f042d5deb836775c7011e906981b99df39a2e088812a912876cf4\u0022, \u0022d76e48faf4f83dadd67928f486dd867060ffdcc96860a7dea6e19c1ff782459b\u0022, \u00221e9e5bc5f736fe4b28dddf8e49806a59618da30138da02046f7b000d8ad3f329\u0022, \u00220ad5d11d0a826a1e8c28c733967d46fc094cd0783d019ffdcda3b9e65ba2c3e8\u0022, \u0022c8802e617986b9848a48906c0154fe32e20aedb8ba2514fc6019eae804020a25\u0022, \u00228c90b78a2e937d125d797c5156039a58149894380127d08d8a833b80386cb741\u0022, \u0022b3b71abcc4ab49ff81597c42ca5a8d7cb39e0bb95b0ddd5846dd14fac30281ca\u0022, \u0022777ee05bad765d2c772b2a9bd04300888530ba75906080fb434b128e1c5794da\u0022, \u00227b3c51178eb4f8ebb74a79636acd4b3702cb1763e58181817e3b0e711518e204\u0022, \u00223487b8fd101a4cfa57ba06a6f8a4d4347853c2f1486aa72c6bb369dc928c3320\u0022, \u0022d71e58a96cbe406177ae2ded012c2cb71f1381216076d1455f3bff22ad3e42f0\u0022, \u0022b0c1970546747b43f5dcf893f986aaf49ec34a17aab38dc58ab1528ddfa87133\u0022, \u00225c060efa6cde81e2457258389d405a0c40028080d7a1f2b29657a2cdd9c839ca\u0022, \u0022ee7bdad7ea83bfcfb77d7204609002d707eb5e98111a737d70b7edef2c77eb4d\u0022, \u00220307f70840c8332b1ffc1e65d155e26e8bdac04a1d7424aeac2cc7f4109842f3\u0022, \u0022270b1684d637039762248d17032d9249f9f97ba217c8dec7df29be387b76bdb0\u0022, \u00223beefd68b7350b2c1ff5c025236b05c9b814cbe99f83a481dabe6d9c8245ddbe\u0022, \u0022a89943af1c276af3f60d978d956c626becbb34afe72af143664902d5d196f710\u0022, \u0022c1ee3dbd90cb7cad171022007f0c7cb86bca9327356b790f79c1dbcdc0af64d9\u0022, \u0022ccf03ab0bae2da1f1c03ad09d26e477e616f47ee2ba9ebf9aac4bd031d49130f\u0022, \u002250ecba086478f475ee681dd7896ecc2ce08033afff138e8619e0b4a0f1d0a770\u0022, \u0022aa4adc53acdb9611b420bac3ebef8dc7afc07e92ea167473157b628aa5e68377\u0022, \u00228a97d54073a8e86f57a3d652e7b9bd5cfb3edda40b030e3adbfb94201b29f271\u0022, \u0022c6dc26d7a01d0de2c587fc6963fa81263bae371bdc5520f3fbaafd70af81147a\u0022, \u0022d700a4f6e4d2360bd5df62238ba4e5dc8863b1c4d00dc864b44126b273a2a7b2\u0022, \u0022507dff4dc7251d4cc35c288160d2bfd1baa90da10472dfbbf5c5a3961c20193d\u0022, \u0022f65949bcc391d294314fded9fbe0c72e85e7d83b369e6faafe649e43ce30dbc5\u0022, \u0022ac2040b80003b6f5c7fcd65a6e4de771c2a18ceb6f9858202e8c47b4f621643b\u0022, \u0022eafc6b05785b99723749a5c5ab97e04179d448b9c81734c8a429aa52e7b7f72a\u0022, \u00225b611680cb696779423d5be6f8f04e929ccd1f3f114bfc35cdaf8609c98f4fc6\u0022, \u002292ce91cee8e50bf0ff6f1639bd18c92b67ced16129551d4199cb512591d5d1c0\u0022, \u0022f53a7ab988e2f4624beb96812afd0bc56a8f1743e97d5ac7b33a85c0be131471\u0022, \u0022ad1486b19aaaa498300d32e4c4223583bb4accfa1a1c33914fbbb63b83aba765\u0022, \u0022a54fc55136b80cd46f27374d8a17784f67c16d7412c3418abdf9d4f5724ad948\u0022, \u00221aa800419ead59b3a7a2a1bed3a50a1e93a820ff1331d5809c0ed2caff6784df\u0022, \u002288e9ec0f5aba79e89864ecce10c46770952cac0c93a3ab50624192bfe2f2cd66\u0022, \u0022ff29317163e01241222fa3a5d892b06f0d76c5dec31346138b66bcd4ff28f8ab\u0022, \u0022c693aa46cecf0704c94eb4b4da019d627ff0a32a3c0c77125db59ee417266832\u0022, \u0022aa5306af27b52f8be74e719754b9cb6d87551fbd61d0a2b43c7937ca496b42b6\u0022, \u0022250f72d4e969b466a28c9a0879ee1ad7e0820cfa746856476bd5385772df6343\u0022, \u00224f5a08d92092f813673bbc3832074cc5172d423269269a43845aa2f49a72fa78\u0022, \u00229eb168670ec13cdf57fe95d32524237bb19e1943c37248b3a985fbe8e8d34c67\u0022, \u00227413b6bb4991fd6c53089d85cd09b7e6e960a22eb0ed87a9fc25ef5267c8bfd4\u0022, \u00220ed56bdac29f38c75f2666618ba4076baf238216b2a95b186e7e8a86f831f68f\u0022, \u0022078ee8ba8e487d76a7e8565b98a1f1656b37c8f3881d23b8f083dbccc66ee65b\u0022, \u002214aa7a54393acc624fb2289a7ca5b9572515d7178a12aaf80e22c0f6161ce4c2\u0022, \u00223fcd6cf7f1d41f590320b403e841ad1d109aea73ff61ad0cdb7b0da1d775af89\u0022, \u0022a4d328bdf210b15cbabcf5b7a15aa2c6718a0054b33798dbacc386bc4e35cbb2\u0022, \u0022f79edccad4a40e9409818f0963ed15a3b9eaeab915af78c5737c28e44529d5b5\u0022, \u0022b9dadf9d3aeab7c276f3d7b6bec3ada1f0a14738128516f229fac906dadc4eab\u0022, \u0022bd346daacbb600f66683c78abc73e52a0ae5459eb1c7f69882616a22d3830d84\u0022, \u002221ce4b67fdb13b1aeeb9090264f69d20038a0c39fa5bb75069d14cdba466b5a0\u0022, \u00229687e42e2556d2dba817dfbd249d07f056e6c7ee17c0128fd2f79fbe94c6c706\u0022, \u00220ef0c03c32627354b73b5ceeb7aa67570f61f0929f53a834a05217e6378bee86\u0022, \u0022531c4666c37c35c3fa6455f3185f87f78cece6d7c735058021a373642c3ba2ef\u0022, \u0022fa94ef38affdcee9654a2af8fd766eed8e5feb6f0dee311b7e0cee767c857410\u0022, \u00220cb5e5138e2b4d920d4cf6394f1eb6faa3a47180e108b82e20df58bb547910e8\u0022, \u00229ec57d80ec0087b6fb8045b78b4556f91453de43392670597acc221a19c0efd0\u0022, \u0022a5dc3c00c6c52f4a8fd14d83c50c326ba449f731b3e1ff00e0ea96b027c5773a\u0022, \u002225c55fd72a2cc43719e2eb4ff03afa76022c61b6ea1ff26d4a560e54f1eaba19\u0022, \u002204bc3f39965ac5097f048ba4e5f38aa5d57f50e8d9edce453ae22630ee3b375c\u0022, \u00225015d78d963de54ca75f8935b02c935f210d8fc3029c2e562924912ed1d7fcd7\u0022, \u0022b4cdda130fdf672c5a4148a2ff254918223e3a805a1db3aafdc03d032d3ecd4d\u0022, \u0022c46b44fce7db8cb0d895ecc94b9ec2db956493a33d28d641249f086dde132fb5\u0022, \u0022acca3a7ae2a15f2812bc89fa45d129b5d1671ce957310c57d123ce11befeb41b\u0022, \u00221213b4f580db95bbdb9be1bc036283484818edba090bb2c58bafdcdfc301f5ca\u0022, \u00224d2cb99631d0d7768ea30624c1f1999f51d94411ad2b03891e2611f2ac80a249\u0022, \u002212c75265a45ef004957e824cf507cfa82009139576e94f9cec1f5250328b10ad\u0022, \u0022cee38fec720e3b86dcf31111f2236f1d4510e77329cf495c381c98f67d9c6926\u0022, \u0022c3ebdedde3913b7d2aabebe69983c9d072fcf3e88eed7db5bbef2200dca0843f\u0022, \u002224977e15b4aaef0cb16b03b4b682fe835de469580d0591a87c96b2c7ee55d014\u0022, \u0022f7a9dda43c6c18f9758c3c263b873e32c50d04838f056f64470f49f87dbf3cab\u0022, \u00223c503b585e1c71318c1abe9f6cb5bdcc482ff010a70484db87e78f8dfeb2fea6\u0022, \u0022e129002d62e70b3712479e9e2ecb29df3a7f8593cd14660c19b0e4a5208d1dcf\u0022, \u00222ec1d0b7e379289a9ced89ced4e00e03435068fca3b8cfe80de8d07dba21c240\u0022, \u00227bbe00b216f9a94845af631971f4a7619669140fc0e987c43b88043e1027a960\u0022, \u0022dcb802ebe70b65e7235de9d971b0c92bdda1f3585997c44f04e631a5da54ed3c\u0022, \u00227b06e0160857f939dc67543aa6b732b08a7df5426d18a5bda423c10c17d91258\u0022, \u0022b39eefb76936959c98b43f97bef5fed1244469b43604cfb95deea49a13e503b0\u0022, \u0022334bac46627126c2cc431919dd03da13e81a7e5ec71ac8312ff9d4e3106f2b29\u0022, \u0022c09e48493a3b5b6ebd01e2786ad0c3d86eb55e54808f8272c81838f4c49a18e1\u0022, \u0022ab7489030ed9c939c4782b597e7be06f05d544547c9579841e9a101cca5553d3\u0022, \u00229fe16d5f3a631fcbb2c41dce031434d8a7a7ca912b8d0a15efeb0d49a6afe1ac\u0022, \u0022db296df34846c56e1d7ed4053d581e7930fef471e46fca9745d2360a811fb688\u0022, \u0022b6e45beb2b32a364b843fdfd081ee5a0f1b1aa9a299fd2dd3732a28455b49182\u0022, \u0022ef408538bd4389cbbd0a08fb8d013963a6967ead1ed9add5aeba135e88d02665\u0022, \u0022942ef11ca99f8cfca3dfe9abe66de94f80bcfb488164ee60771a0d199b5edb85\u0022, \u0022286f5ce2aa64abeecbe65ffe341fcdfc825beb6a0552b5a553aaa1785cd31a01\u0022, \u0022f2f658171b17947b3f374fd317aa4022a3da07065204b6164234dc62bd336def\u0022, \u0022130b843cb13f6d05bb5bbfd37868d9f593df9a12e16e4ebfbc9a67192ad049e9\u0022, \u00223a293d427e5c081c3551d6d9c48ef465e3d617b5344578204b18f8a2f4455902\u0022, \u00228a25d5a1c622506c66ec106cd21c0e9590c702a213ee1962ccbca62454abd619\u0022, \u002273ea7fd518f1ec545b5efd3d85315b5963fa864aeb14e29a12780179e55de3c2\u0022, \u0022363993c4561dbd29dfb7ed78ba0cd92a87fc1a590ec6d0fa123d5a84f16ec112\u0022, \u00228b79ff06cbe79496f884af5c7c02658ec44358a4dc8f554945ff761578d77a71\u0022, \u002279f3129641c45bfcb5fabeec729bef71fc2be6dabb7bc6c3b4248aa5092d14f4\u0022, \u00224793d18dcb73c37fc51fb9adf28d57eefd1f52fac5558b4e674e18b6d5e69926\u0022, \u00221637e096af64864894822d35a0e5a8dbed708a4addab67f85b4d527712021a4c\u0022, \u0022f40046000a6b24a86560172423f1c243bc219ee83c5150acf2eed65e5edd8444\u0022, \u00227580cc5e50ea80a68dd38674ceb75d11d5cfc4985895195a8cb2c62a81b475b3\u0022, \u0022278d3872d86a41fd8ea83b5ef0c7118ecc6a445e6d0da818b08ac7c689d53f6d\u0022, \u0022484ca41a955e34375f491e7a8fdb4a3f5dbe61d869040e3eaad416daed5ec9f7\u0022, \u0022eeb9e1811f0a410eb9aa371bb6e4fdf306803a2d18cf8134a8b1b7abd4517bf7\u0022, \u0022bd853607ffb4f967fec0dcccc1132c1f2e113aee001f66762b5088f5814eac12\u0022, \u0022a155ea91f7a8bc44d7f2e13139beca412a8e9f0a23ad5b080ef282abda82aab6\u0022, \u00226ccb150b68cdd3d871abf2a6ad6dbef55306fc455fedc46b2e4d0852ec9b2617\u0022, \u0022adbe6888ee2b4d8109a49159e0a99272b56f6e437a749e3c7ce978b540f783b7\u0022, \u0022592a01780ad4340df4ab1ba69f44360715e98c0e79095a02d317390c53497d0a\u0022, \u0022013593f38ff3848060bdb67e0b53136968bc1ecb91903cdbe2ed21cfe56f457e\u0022, \u0022d75a23e4d936f2189486f8a3d6938f9fb5cfe03869ce71edcaca328301edb099\u0022, \u002237b4f1b6c7b3988872bb3f277605f026a5fd18420f8d24021e05c00e0acbb4b8\u0022, \u0022274b23a4962f7f86c48a1147fde195837faba3124cc98ccaffdc0aa4c9b94cdb\u0022, \u0022939a66a60d1f8c46f971ef74e1d95577441a1e68e17dee820a6bea7ed99e8b78\u0022, \u0022fbe25ba09dba3f822368f9316e92db264cbdd92b10ea2c6a9ccb64abbd29806f\u0022, \u0022ed72f7ce3d2154ab42711843c6905bfb024c36c2229fc7997100131b61119be1\u0022, \u0022b057aec46ce6bb2860999f0519de4477514b5afb09b2aa98d8853e861c2a02c8\u0022, \u0022e4d507aad00b9054ef6d440fc2888693dbd99ab4b535eb5acc7d4d77a3a5d245\u0022, \u0022a5c6ea417966ecf1000d35f1497375de399aa25210fbb87aeef2c5ab3f03fccb\u0022, \u00220ac58a8d6e78b3ed5d9a3ddd7adc7a4957031f0af3b68f443b85ab27b83d4a62\u0022, \u0022fc21dcdd78de61e2d14937738cd913e74f8fbdc94e6591e6e300429f9943a4c9\u0022, \u0022b54cff4c8ca7bbb960d79a9f329f3e160389c48b7020d194089d8b824ad3d6d2\u0022, \u0022986e2890737d7abe583e75e30c3d93b1a209289aee87e4a8a46af45394e4095f\u0022, \u002297fd66941374e559c6a89ea60593701b4edaa92f4b9305a1b8646bf975a81965\u0022, \u0022b30d6916c1144b06488610e2788c7704791a80fb48d9fde8979eb455b9e52e6f\u0022, \u0022add5902878a856e205671a682e8aab9cc1d77a13dbf78b1b5e20ea8e7c5e7a37\u0022, \u002278238dd0a991e975697b710505fa1ee85e97f53d49f1d88307985acaf4d5cff8\u0022, \u00228c635dcb65eabd5832aa81292f70a6922066bbd85e4ed1c5b373dafe0caeb6a1\u0022, \u0022c8517817ec90c19f46e0b4118b0c3019c0678f2498e964d45d7776b9408c3568\u0022, \u002249759da0b92531b683dd4a35268cd7fde31d3a52353a26b2a79635fb5e5ac7ae\u0022, \u0022b636612da1bbfc7936df6ac6042cd5af30a5fb211bd68e0856b83762f3741690\u0022, \u0022c11b93e6ecd1a9dee36645396eb7354012d858fa42e0cddd9b314c037f0289fc\u0022, \u0022fd4e9ab8544e90317e40abd66213c2e38eda487f8a791080f72426820ff34a11\u0022, \u002200d87bc5e55ea9265b9a465ee12e2ca32cc01b5a69128f9607bd3661c3b3cc5e\u0022, \u00221a2b3310a12b799f6a3c335f7354357ac284bc83524aa72c7b635af6d4c9c689\u0022, \u00223e105807a8ef336c90c3b79f0e51ef44935330e91b48a56663cc470e481c9fb2\u0022, \u00225688bfe5ed7f0e51bfa57fe9229d0e1d602b7f0352c777167a887e1a92f62603\u0022, \u002233cd3eca8aa69fb768a7a3742183f92e98f7e348413d2260b14370583b61bf87\u0022, \u002270b33b66bc0d9ed9dc4f74077f5da0ff5f7886af122d2e0111444ce2e1ceaacf\u0022, \u002264de083078cb676120f76a398d5f7e7c12abc7b7239104283584495ab96adeef\u0022, \u0022f69bee49ad2f535996dc76e39256cb02d956dd6be213bce0e7c9a18ae51dbf43\u0022, \u00222544eba49144932e4603d2d3acaec7c33e4defd2d84660b35465a3391642c353\u0022, \u0022b0e7debaa21a9c30170de0eb0c1367ae09f6c16f5f6d2c805161906ed1ba78ee\u0022, \u00226239d21494064f13763573421c9e3e8b240586c4a98a504422f09b79d5075571\u0022, \u0022b91743d2d5a9eee843e91f4e2151d15e5a8cc2aad2c3bc0d1f6bd27b6f31fc03\u0022, \u00229eaedefa7385627961f33e4856f3abf1e3ac1010580abcec8ce26b142daaa8bc\u0022, \u0022c68c61f180caa23fd9854a2e9b791cefe0c114bdec6a8b4c7789a9ca5a3b430c\u0022, \u00228e3b4c00fb47fdf7516ee9ce401a2b838ac6d9811524641391f9821a95976fe9\u0022, \u00227dd55ca75349b8bfd0a604e80e1d43fad5f3e8b707f8b378e577d4d79ffcddbe\u0022, \u002233a05827a2932affdf18cb892fec74d87725a3f716045855e05f6afdc0d392dc\u0022, \u00221a3c5d4be34a913c70fbf66deec32c335d9d4170288ea18c229604c0b7434f23\u0022, \u0022cbf9180a7cfdc1cfc0953fad27717e446ae62d1db6eb0ff9a273c5155fe03c94\u0022, \u002281c06e6c168f5040f2ac77a55dfbd9f2568ed536773d159085a50111b28ba9c5\u0022, \u0022f39e25430357d1a98540c59f2dca48cb73718f0a902f7cb27f06f87c7b06f003\u0022, \u00229aa16983eb118cfaf88510e8984ca87dc443fb9fd63616b7ebfdb099e13bf212\u0022, \u00223e30c27b8e9ecf2d7f8a19c0866bf3aa457f85344fb4ad5878af0589ef9fb80f\u0022, \u00225d845c592c5103785bbb77c513ff8d478addca588e56c5dca9a92ce15a901377\u0022, \u0022a11c92bcea461a9e407776dd5d0109abbac1b6bf96a38a6fab041847a2ba0d1d\u0022, \u0022e0c3c516794a76f87cd726969db3934172f7478c8740e6be320fc2cd9b03530a\u0022, \u0022ab3777a63f4a5bc89e20e7c1f2d061d4e7b22f40555e71039fcb8d3305105235\u0022, \u00226d4efb2584f580586b741da55ec0a1d86766a297e5ddb711be9140d381a810a5\u0022, \u0022a2788ccb6290a3fc0621d0fbffbac0e0cc19c5dd04b064467bdb3b2eeb55c495\u0022, \u0022e49052f0082ce46df62c28bb31e5249a3300eb2a9889cce40e34cfde1e8a45ec\u0022, \u00222a12b693e9e18fa3bc3f6219cc036d5353e50fbbc8d55d15489f7f0b2b8354aa\u0022, \u002256e67bf416145977b04f85eede6b0f4ea7a32d906634746c1beac495f0dc2015\u0022, \u002226768ed052674413fdffa57009cd2aa6d737c1661697d85aeeb012853be5e9cb\u0022, \u00220bd47f8a4a4254c52818992ae66584d0ea48f2490cbb45a3dd07171a576dec75\u0022, \u0022e471668a35f54f9eb0882f676c8559e2c4b494bff28c6ec120b77b9d84d33f46\u0022, \u0022d48e7dbb087fec7704e65b06c80293328e34845b8806911b07839231b20914bb\u0022, \u0022aeaaa4354b71846dac99b71557b2b8f289124bcaeaf8a0f9d68f8859f0348520\u0022, \u00225953d54311ce3655b4296cd03fa7a860fbd472de018d1029a6223f64c352282d\u0022, \u0022a079a2eca78ca1cc21f6dd3d18eecbc656e68cdf3cd72cc6bd56aea4fff178ed\u0022, \u00228eb721ccf6edda8e5ae9e0a0f498afc141011dd47091958ce0755e4da5f5d1b4\u0022, \u00224bac46d0eade01dec9570a298f5d345eb3e16777981858be7b7780ef2ccedc2d\u0022, \u0022d5b73f92bf477e4af36f5f801c9ba6f9f7f903cd76c7054333cba256e4258017\u0022, \u00224dbfa08cd84da4383ee825285ee6164eb7e293873c991abcfe27dbd458b14a4c\u0022, \u0022d4322e23f3a4ee93e130970fdc4aaa299376fdb045d719d4223d94c94bb97e84\u0022, \u0022ce6971649d44562ef822363f544f63b308dd83bb079d94b4ea2186942045be05\u0022, \u0022fe078a5a678d5157b478753bba1a8e155109e9e1455e7b66d20a964d47e1b7b8\u0022, \u0022253bf9b0f976a51257626487ee12a362e87835f9e50ed13a2734c03354d2736f\u0022, \u002286a0cb441b73e48bdb826fdaec2f7fd8c410cac902adf7ff7867db4650c08f63\u0022, \u0022aef1e10361e7351b8ac5a0db1cf249bdf11296ac3b7e20e5c6631fd125e9720a\u0022, \u0022e1da034280da221bdd53f619b61a11f4b2688c3629588f5908a01a483027fb98\u0022, \u00222adf354da5dc291566e5cb75b95a062dd95f52716f29fb7b2c7103a7cadedc77\u0022, \u00229a8b3a426c4dcfac28282d4ffcff794da255886878e6306b2d64180265a28b31\u0022, \u00221717a1b5d5b11a67eed412f8cf3b4fcbda9433e7997672522cca9995d43ad9f8\u0022, \u00222579f4acef4a4bf597d3ccc751803606c89a39e27099f49bcd9aa7324cbb563a\u0022, \u002224a6f16e3dad2bcbb86334485345f81cfc2ec0d1d051af3a76e83d7225a70144\u0022, \u00222c613d9ea356bb60d1207f86f3ec19a5d6e0190d1f9e3906c5fbf8c822e6b49d\u0022, \u00225cad77ceb5565854cb337508ec987632769a25186430ac1b94a47112c1e016ed\u0022, \u00224d8d468b75ca991cbda9980ea7c71bc1fbaffdd9899370f0b75f4395c92b24ff\u0022, \u0022db0fc486b428093afac68dd902f4e9993f36b859426be188bd4792e1ad0635c6\u0022, \u0022a36750985ff7e40b725ba1e526f1ab3337b697c34262143a47dad22bafa1b38d\u0022, \u00224ae58d6b094c80c7680eea7a796ffac863904966877eb66993c76329b73eca8b\u0022, \u00225eb18ce71052664b5ab654af1ac23dfe492184b3447a52f64cd58ed31e2d66d0\u0022, \u0022d4b2faa6fdf2ae505ccad9e2a671870dd778f58d3f13110a2889730844156bd9\u0022, \u0022637f73de14cd0ef6b16c670b0ad3a84a19cc8cd023eb9139a513ee26e979d2d0\u0022, \u00223662e973ceaaa3df56140e329e52dd112ebe80f8e0c697f4ce3cb76e2ed6297d\u0022, \u0022c9fda4960193bda07a8480b8f293dbb03d0af0d8ff381a9b7d851fc423a63937\u0022, \u00227d699400846853e7f86ddcbde55a5c976e3b65da8b721ac739bc5196b678d114\u0022, \u0022befb7b6e6f47be0a06102122e5955a613ecac9f94dd3917cd4219cc788fd61a0\u0022, \u002293ce2b84140316b87250bcc95f6ab467dcaf436b218f0f91feb97bac604837a8\u0022, \u00223b8001ddd784199b53f6dcf0c02ef494db5edbd41499bba9bcd49a26f38b10d7\u0022, \u0022d4a67447f3602f4a8dcbb0bc9d69a9708f1b9578918ad60b20e7d0904cf68df8\u0022, \u0022f48ff2360da84275d62862c036b3d00fb1b7511b63154deab9e4912cd4633053\u0022, \u00222deb1ea5fd2b83f1c428c75c32de1adaffe29a1f61fb9ac879c629b78334baab\u0022, \u00229ed7371e62b93f702d61dd514c9ab099a277cc77473eb71f351700810a5403ff\u0022, \u0022b2afa3346d5243b6a0baf4af2a572c728bd1dfb2389fee5269789156e0b926c8\u0022, \u0022678edc74a9f9406a94cf47c52347627632541401f69e68a891858cc7fc9ea019\u0022, \u0022f8d6766f63a17d3838d36618f2d4a73eda64897e2a8ab55c93c6cb27366f5a06\u0022, \u0022b252e03b06ffbad1b10ca34aa0621e5ec0108eb0f81ce5eb210284ce9e09ac05\u0022, \u002269368bac250742c3d3f41af94e926a99803bed1c7c55453ecf507f6350dc9d4b\u0022, \u00227beb631d9945f4cd3f0689487351968be7188db62293720ba35f6ea8f8795523\u0022, \u00224e2027af2348b41600a837970fe88242487c09f4a3f4b586f245fbddd1db0bc2\u0022, \u00220f8fc3198aa58bfae15782154d4596d6272398f58f92151822ca08f42cab607d\u0022, \u00228a51a9630a450d9c90b222378626465a35bff4b49b72e8fb7eb33ec5149aebef\u0022, \u0022b240ef2ebf94f72f48439a90234b44447ee26b701892560785ec5ebd2f51a656\u0022, \u00228db893339ce203f95bc2ffaa5d5c03b9dd71dded7e51230847c8981d35a2daec\u0022, \u002239a585d5097dd00a7fe710c11d68c643a3264f0043c6d00b3c4eff970c7b768c\u0022, \u00221782a1e1714b15cacf52b050b1219ab7f745bae1891f078e3b208dfcaebafe19\u0022, \u002211b95e661005f8b85585fd059aaad972d1e1e9afca23d2d347d468f5db051c3c\u0022, \u00222ec477568b2a60dd10109fa1932c564b55f6369ac99fd376cf2163debe17c8c2\u0022, \u0022bf3b40b75e07827f6871200ff5ada8c93b074de826dba121ba8d8b163cd2a9dc\u0022, \u002218b1ba43c0e1f393310dc1515146ec5bec638d899273d52c86f46cfd5958cb51\u0022, \u002280314a5ccaec7eacd81aee1b0965ca5b0a8a0af52727fe956c7150af182e8ed6\u0022, \u002297e2dc382463538f06e83218abff6cea8c5523882c9aea1fb41dddac628c3d30\u0022, \u0022c1a46c6de3806049bd31224ab425df605cf372f18f0cb64b0f32224d849c1390\u0022, \u0022c3a7c008f0fa9ce55654e286dfd57cf53878949d61a52e97194cebf964b322f4\u0022, \u002212a764ce0dd2d1a6a1afbbebd885025c0b4ebe336dc63cbddbc7feceeb2bf5ce\u0022, \u002222ef3c761585fb3a256276bb52a37e63cc03f4266ca2fd26a3b2ef96abad5c31\u0022, \u0022722201fd29e2a0b55ee8afe1da27d72b23aec7f400b24addb3f737e48b850b63\u0022, \u0022d4d47f37489792d754702a6badfe1a377568ea51fa127d67c378854203c36eef\u0022, \u00223e5f1cb51a92e97f2370ba2f98a4925b8c891de5050c49eb6f5e71512c18a804\u0022, \u00227414a7b3996b14c9435d90e202584925c305239a3751672e7133f1aa69e1dbba\u0022, \u0022d3799600142c9056f32f63d2d6dd4299593491a33ada9b2980ba513c51af6268\u0022, \u00225e39af92eb7294442aac4674262b35fa8e4c94f181e4b4eddd2b1f41103293ac\u0022, \u00223ce13b689178687323c02632eff6bede6208eaf026c1b4734b2e7046ac0989b3\u0022, \u00227c02b6e4e05a4076ad37478f6dd11c71d21d99fd92cde06405721727143ae8b3\u0022, \u0022ee238e6852e002a13f554489f975d260e919cf82ea53632e46ca0d4da3508fe9\u0022, \u0022c0830cf93bdeb1e8b34e3ba7984834d387adcb830ee33ffa65c4628b19edae59\u0022, \u0022e9a01c054986a7937827ab1670c05a9f369f3479eee033ba4d0fad1380ad7681\u0022, \u002291ca2167d20a84be3a6ac694134251a83ab0fa9a6c76b1de7130a9d543c5ac8a\u0022, \u0022092fcda8a532f2f4375ed5ba7de92765c9fe947e5b9a26558033c76f565f7ce7\u0022, \u002290e883bb25f021ebdfeae7ccfebd2071c7300fe129bf60df316608823857d95b\u0022, \u0022bff6941d944c738c7a963a4084ef7f5f0ea29e9cc3f8ca10ebbb94ab6851a6c5\u0022, \u0022632b4d0c8bf768277eb76dfd9e136429b50f5f030e55180e395d25cf78612b71\u0022, \u0022db8fcd2423f05300984ec737b65ce6683240a60d9134074e4ad65e0fefb7916c\u0022, \u0022fecf1303e76447084d58f7f8faaf6fd734d33d2aaa0706d80f3b2ea683c1acd2\u0022, \u002261ca11a849ea9992a5273da64fe955fd4bcd42b59c0ce5cabea5d88189ab6cb5\u0022]";
+        window.date = "28.10.2025";
+
+
+        async function digestMessage(message) {
+            const encoder = new TextEncoder();
+            const data = encoder.encode(message);
+            const hash = await window.crypto.subtle.digest("SHA-256", data);
+            return hash;
+        }
+    </script>
+
+    <!-- AlpineJS Component: wordGame -->
+    <script>
+        function wordGame(initialGrid, initialHighscore, bonus, validWords, date) {
+            // Helper function: debounce calls to "fn" by "wait" milliseconds.
+            function debounce(fn, wait) {
+                let timeout;
+                return function(...args) {
+                    clearTimeout(timeout);
+                    timeout = setTimeout(() => fn.apply(this, args), wait);
+                };
+            }
+
+            return {
+                score: 0,
+                gridCells: initialGrid,
+                globalHighscore: initialHighscore,
+                gridDate: date,
+                bonus,
+                selectedWord: '',
+                message: '',
+                bonusUnlocked: false,
+                animateInput: false,
+                wordsOpen: false,
+                rulesOpen: false,
+                submittedWords: new Set(),
+                gameTimeout: false,
+                submittedWordsIndexes: [],
+                dailyWordsSet: new Set(JSON.parse(validWords)),
+                longestWord: 0,
+                quote: '',
+                slides: null,
+                currentIndex: 0, // Start with the first slide visible
+
+                // This will be assigned during initialization.
+                debouncedSaveState: null,
+
+                init() {
+                    // Initialize the debounced version of saveState with a 500ms delay.
+                    this.debouncedSaveState = debounce(this.saveState, 500);
+
+                    // Show rules only for the first session.
+                    this.rulesOpen = !localStorage.getItem("rulesShown");
+                    const savedState = localStorage.getItem('gameState');
+                    this.slides = document.querySelectorAll('.carousel-item');
+
+                    if (savedState) {
+                        const state = JSON.parse(savedState);
+                        if (state.date === this.gridDate) {
+                            Object.assign(this, {
+                                score: state.score,
+                                selectedWord: state.selectedWord,
+                                submittedWords: new Set(state.submittedWords),
+                                submittedWordsIndexes: state.submittedWordsIndexes,
+                                gridCells: state.gridCells,
+                                bonusUnlocked: state.bonusUnlocked,
+                                message: state.message,
+                                longestWord: state.longestWord
+                            });
+                        } else {
+                            localStorage.removeItem('gameState');
+                        }
+                    }
+                    this.generateRandomQuote();
+                    // Use debounced save for state watchers.
+                    ['score', 'selectedWord', 'submittedWords', 'submittedWordsIndexes', 'gridCells', 'bonusUnlocked',
+                        'message', 'longestWord'
+                    ]
+                    .forEach(prop => this.$watch(prop, () => this.debouncedSaveState()));
+
+                },
+
+                showSlide(index) {
+                    this.slides.forEach((slide, idx) => {
+                        slide.classList.toggle('active', idx === index);
+                    });
+                },
+
+                nextItem() {
+                    this.currentIndex = (this.currentIndex + 1) % this.slides.length;
+                    this.showSlide(this.currentIndex);
+                },
+
+                prevItem() {
+                    this.currentIndex = (this.currentIndex - 1 + this.slides.length) % this.slides.length;
+                    this.showSlide(this.currentIndex);
+                },
+
+                saveState() {
+                    const now = new Date();
+                    const day = String(now.getDate()).padStart(2, "0");
+                    const month = String(now.getMonth() + 1).padStart(2, "0");
+                    const year = now.getFullYear();
+                    const today = `${day}.${month}.${year}`;
+                    if (today === this.gridDate) {
+                        const state = {
+                            date: today,
+                            score: this.score,
+                            selectedWord: this.selectedWord,
+                            submittedWords: Array.from(this.submittedWords),
+                            submittedWordsIndexes: this.submittedWordsIndexes,
+                            gridCells: this.gridCells,
+                            bonusUnlocked: this.bonusUnlocked,
+                            message: this.message,
+                            longestWord: this.longestWord,
+                        };
+                        localStorage.setItem('gameState', JSON.stringify(state));
+                    } else {
+                        this.gameTimeout = true;
+                        localStorage.removeItem('gameState');
+                    }
+                },
+
+                getCellPoints(cell) {
+                    // Extend this logic if bonus modifications to cell value are applied.
+                    return cell.value;
+                },
+
+                checkBonusUnlock() {
+                    if (!this.bonus || !this.bonus.pattern) return false;
+                    const pattern = [
+                        [parseInt(this.bonus.pattern[0], 10), parseInt(this.bonus.pattern[1], 10)],
+                        [parseInt(this.bonus.pattern[2], 10), parseInt(this.bonus.pattern[3], 10)]
+                    ];
+                    const cols = 4;
+                    for (let i = 0; i < this.gridCells.length - cols; i++) {
+                        if (i % cols > cols - 2) continue;
+                        const block = [
+                            [this.gridCells[i], this.gridCells[i + 1]],
+                            [this.gridCells[i + cols], this.gridCells[i + cols + 1]]
+                        ];
+                        let match = true;
+                        for (let r = 0; r < 2; r++) {
+                            for (let c = 0; c < 2; c++) {
+                                const expected = pattern[r][c];
+                                if (expected === 0) continue;
+                                if (block[r][c].value !== expected || block[r][c].final) {
+                                    match = false;
+                                    break;
+                                }
+                            }
+                            if (!match) break;
+                        }
+                        if (match) return true;
+                    }
+                    return false;
+                },
+
+                handleCellClick(index) {
+                    this.gridCells[index].selected ?
+                        this.unselectCell(index) :
+                        this.selectCell(index);
+                },
+
+                selectCell(index) {
+                    const cell = this.gridCells[index];
+                    if (!cell.selected) {
+                        cell.selected = true;
+                        this.selectedWord += cell.tile;
+                        const potentialScore = this.calculateWordScore();
+                        this.message = potentialScore === 1 ?
+                            `<b class="text-[16px] xs:text-xl">${potentialScore}</b> BOD` :
+                            (potentialScore >= 2 && potentialScore <= 4) ?
+                            `<b class="text-[16px] xs:text-xl">${potentialScore}</b> BODY` :
+                            `<b class="text-[16px] xs:text-xl">${potentialScore}</b> BODOV`;
+
+                        this.animateInput = true;
+                        setTimeout(() => this.animateInput = false, 100);
+                    }
+                },
+
+                unselectCell(index) {
+                    const cell = this.gridCells[index];
+                    if (cell.selected) {
+                        cell.selected = false;
+                        this.selectedWord = this.selectedWord.replace(cell.tile, '');
+                        const potentialScore = this.calculateWordScore();
+                        this.message = potentialScore === 0 ?
+                            '' :
+                            potentialScore === 1 ?
+                            `<b class="text-[16px] xs:text-xl">${potentialScore}</b> BOD` :
+                            (potentialScore >= 2 && potentialScore <= 4) ?
+                            `<b class="text-[16px] xs:text-xl">${potentialScore}</b> BODY` :
+                            `<b class="text-[16px] xs:text-xl">${potentialScore}</b> BODOV`;
+                        this.debouncedSaveState();
+                    }
+                },
+
+                resetWord() {
+                    this.gridCells.forEach(cell => cell.selected = false);
+                    this.selectedWord = '';
+                    this.message = '';
+                    this.debouncedSaveState();
+                },
+
+                getBonusColor(digit) {
+                    switch (parseInt(digit, 10)) {
+                        case 3:
+                            return '#359B5E';
+                        case 2:
+                            return '#C6841A';
+                        case 1:
+                            return '#AE0D21';
+                        default:
+                            return null;
+                    }
+                },
+
+                validateSelectedWord() {
+                    this.message = '';
+                    if (this.submittedWords.has(this.selectedWord)) {
+                        this.message = "už použité";
+                        return;
+                    }
+                    // Assuming sha256 from an external library is available.
+                    hash = sha256(this.selectedWord).toString(hex);
+                    if (this.dailyWordsSet.has(hash)) {
+                        let available = this.gridCells
+                            .map((cell, idx) => cell.selected ? {
+                                idx,
+                                tile: cell.tile
+                            } : null)
+                            .filter(Boolean);
+
+                        const indexes = [];
+                        for (let ch of this.selectedWord.split('')) {
+                            const match = available.find(c => c.tile === ch);
+                            if (!match) {
+                                throw new Error(`No available cell for tile "${ch}"`);
+                            }
+                            indexes.push(match.idx);
+                            // remove that cell from future matches
+                            available = available.filter(c => c !== match);
+                        }
+                        this.submittedWordsIndexes.push(indexes);
+                        this.submittedWords.add(this.selectedWord);
+
+                        this.score += this.calculateWordScore();
+                        if (this.score >= this.globalHighscore) this.submitScore();
+                        this.increasePointsOrResetLetters();
+                        if (!this.bonusUnlocked) this.bonusUnlocked = this.checkBonusUnlock();
+
+                        this.generateRandomQuote();
+                        if (this.selectedWord.length > this.longestWord) {
+                            this.longestWord = this.selectedWord.length;
+                        }
+
+                        this.resetWord();
+
+                        window.dataLayer.push({
+                            event: 'submit_word',
+                            word_length: this.selectedWord.length,
+                        });
+                    } else {
+                        this.message = "neplatné slovo";
+                    }
+                    this.debouncedSaveState();
+                },
+
+                calculateWordScore() {
+                    const cellPoints = this.gridCells.reduce((sum, cell) => cell.selected ? sum + this
+                        .getCellPoints(cell) :
+                        sum, 0);
+                    let bonusVal = 0;
+                    if (this.bonusUnlocked) {
+                        const selectedCells = this.gridCells.filter(cell => cell.selected);
+                        switch (this.bonus.index) {
+                            case 0:
+                                bonusVal = this.selectedWord.length === 6 ? this.bonus.value : 0;
+                                break;
+                            case 1:
+                                bonusVal = this.selectedWord.length === 7 ? this.bonus.value : 0;
+                                break;
+                            case 2:
+                                bonusVal = selectedCells.filter(cell => /[AEIOUYÁÉÍÓÚÝÄ]/.test(cell.tile))
+                                    .length * this
+                                    .bonus.value;
+                                break;
+                            case 3:
+                                bonusVal = selectedCells.filter(cell => !/[AEIOUYÁÉÍÓÚÝÄÔ]/.test(cell.tile))
+                                    .length * this
+                                    .bonus.value;
+                                break;
+                            case 4:
+                                bonusVal = (!/^[AEIOUYÁÉÍÓÚÝÄ]/i.test(this.selectedWord)) ? this.bonus.value : 0;
+                                break;
+                            case 5:
+                                bonusVal = (!/[AEIOUYÁÉÍÓÚÝÄ]$/i.test(this.selectedWord)) ? this.bonus.value : 0;
+                                break;
+                            case 6:
+                                bonusVal = (/^[AEIOUYÁÉÍÓÚÝÄ]/i.test(this.selectedWord)) ? this.bonus.value : 0;
+                                break;
+                            case 7:
+                                bonusVal = (/[AEIOUYÁÉÍÓÚÝÄ]$/i.test(this.selectedWord)) ? this.bonus.value : 0;
+                                break;
+                            case 8:
+                                bonusVal = (this.selectedWord.includes(this.gridCells[(new Date()).getMonth()]
+                                        .tile)) ?
+                                    this.bonus.value : 0;
+                                break;
+                        }
+                    }
+                    return cellPoints * this.selectedWord.length + bonusVal;
+                },
+
+                generateRandomQuote() {
+                    const enterQuotes = [
+                        "Vitaj v hre, v ktorej sa slová hľadajú ťažšie než stratené ponožky.",
+                        "Vitaj v hre, pri ktorej sa nenadáva!Teda… pokiaľ sa fakt nezasekneš.",
+                        "Vitaj v hre, pri ktorej ti mozgové bunky poďakujú… alebo vypovedia službu.",
+                        "Vitaj v hre, v ktorej si môžeš potrénovať jazyk.Gramatický, nie ten druhý.",
+                        "Vitaj v hre, v ktorej sú chyby dovolené– ale iba ak sa z nich poučíš.",
+                        "Vitaj v hre, v ktorej sa mozog zapotí viac ako ty po troch schodoch.",
+                        "Vitaj v hre, v ktorej sa slová hľadajú ťažko ako diaľkové ovládanie.",
+                        "Vitaj v hre, v ktorej na veľkosti slov záleží.",
+                        "Vitaj v hre, v ktorej je tvoj najväčší nepriateľ– vlastná slovná zásoba.",
+                        "Vitaj v hre, pri ktorej sa ti budú ťažko hľadať slová.",
+                        "Vitaj v hre, pri ktorej si občas povieš: nemám slov!",
+                        "Vitaj v hre, v ktorej sa do slova zamiluješ.",
+                        "Vitaj v hre, kde rozhodujú slová a nie činy.",
+                        "Vitaj v hre, kde ťa slová doslova oslovia.",
+                        "Vitaj v hre, v ktorej pocítiš silu slova.",
+                        "Vitaj v hre, v ktorej si overíš či poriadne ovládaš SLOVENČINU.",
+                        "Vitaj v hre, pri ktorej občas zostaneš bez slova pozerať.",
+                        "Vitaj v hre, v ktorej treba držať slovo– ak ho nájdeš.",
+                        "Vitaj v hre, kde si overíš svoju jazykovú podkutosť.",
+                        "Vitaj v hre, v ktorej nemusíš vážiť slová."
+                    ];
+                    const midgameQuotes = [
+                        "Mozog na plné obrátky. Len tak ďalej!",
+                        "Slovná zásoba na úrovni.",
+                        "Pokračuj, ide ti to výborne.",
+                        "Len tak ďalej, si na dobrej ceste.",
+                        "Výborne, máš za sebou kus práce.",
+                        "Dobrý výkon, pokračuj v tom.",
+                        "Tvoj výkon je stabilnejší ako post riaditeľa SNG.",
+                        "Kiežby sa aj diaľničné úseky stavali takto plynulo.",
+                        "Podávaš stabilný výkon – presný opak našej ekonomiky.",
+                        "Máš také vysoké skóre, že ho práve skontrolovala daňová kontrola.",
+                        "Hráš tak dobre, že DPH sa práve rozhodla, že ťa nebude zaťažovať.",
+                        "Spomaľ, inak si tvoj mozog vypýta sabatikal.",
+                        "Skóre ti rastie rovnako rýchlo ako počet hoaxov na Facebooku.",
+                        "Píšeš silnejšie než tekvicové latte.",
+                        "Keď skončíš, odporúčame ti tento článok:",
+                        "Takto rýchlo rastie už len počet ľudí, ktorí veria, že Zem je plochá.",
+                        "Kiežby sa reformy zavádzali s takýmto nasadením.",
+                        "Super! Zdá sa, že vieš naspamäť Slovník súčasného slovenského jazyka.",
+                        "Výborne, nemám slov! Teda mám – v ďalšom leveli.",
+                        "Dúfam, že nemáš prázdny slovný zásobník, pretože ideme ďalej.",
+                        "Chceš ešte väčšie skóre? Beriem ťa za slovo!",
+                        "Nie je dôležité vyhrať, ale zvíťaziť. Poď ďalej!",
+                        "Tvoja jazyková fundovanosť je ohromujúca, len tak ďalej.",
+                        "Ide ti to! Tak ukáž, koľko ti zostalo zo slovnej zásoby.",
+                        "Si postrach slov. Žiadne sa pred tebou neschová.",
+                        "Naučiť sa celú slovenčinu slovo za slovom bola pre teba hračka, však?",
+                        "Tri slová, tri obyčajné slová: Poď hrať ďalej!"
+                    ];
+                    const endgameQuotes = [
+                        "A je po hre! Ak sa ti páčila, povedz to priateľom – ak nie, nepriateľom.",
+                        "Hotovo! Pošli výsledok niekomu, kto si myslí, že je múdrejší než ty.",
+                        "Koniec hry! Skús zajtra poraziť svoj výkon.",
+                        "Hotovo! Teraz môžeš vypnúť hru a tváriť sa, že šlo o pracovne strávený čas.",
+                        "Dobojované! Ak si lepší než tvoji kamaráti, daj im to vedieť.",
+                        "Pekné skóre. Sdyeľaj kim nesmažu.",
+                        "Hotovo! Teraz môžeš konečne pokračovať v pôvodnej činnosti.",
+                        "Hra sa skončila, ale hneď sa môže začať ďalšia.",
+                        "Dohrané! Keď ťa nikto nepochváli, pochváľ sa ostatným.",
+                        "Bavila ťa hra? Každá radosť sa zväčší, keď sa o ňu podelíš.",
+                        "Dobrá hra. Tak ju pošli ďalej.",
+                        "Táto hra sa skončila. Súboj s kamošmi sa môže začať.",
+                        "Si na konci. Daj kamošom vedieť, že máme dosť slov aj pre nich.",
+                        "Ďakujeme za hranie. A vopred vďaka za zdieľanie.",
+                        "Bola to zábava? Tak šír zábavu ďalej.",
+                        "Dobrý výkon. Ale každá hra je lepšia, keď si zahráš s ostatnými.",
+                        "Dobrý výkon? Podeľ sa o radosť. Bolo to slabé? Podeľ sa o frustráciu!"
+                    ];
+                    if (this.submittedWords.size < 1) {
+                        this.quote = enterQuotes[Math.floor(Math.random() * enterQuotes.length)];
+                    } else if (this.submittedWords.size === 5) {
+                        this.quote = endgameQuotes[Math.floor(Math.random() * endgameQuotes.length)];
+                    } else {
+                        this.quote = midgameQuotes[Math.floor(Math.random() * midgameQuotes.length)];
+                    }
+                },
+
+                increasePointsOrResetLetters() {
+                    this.gridCells.forEach(cell => {
+                        if (cell.selected) {
+                            cell.usageCount++;
+                            if (cell.usageCount < 3) {
+                                cell.value += 1;
+                            } else {
+                                cell.final = true;
+                                cell.value = 1;
+                            }
+                            cell.selected = false;
+                        }
+                    });
+                    this.debouncedSaveState();
+                },
+
+                submitScore() {
+                    const payload = {
+                        score: this.score,
+                        words: this.submittedWordsIndexes.map((word) => this.encodeWordIndexes(word))
+                    };
+                    fetch('/api/validate-score', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
+                                    'content')
+                            },
+                            body: JSON.stringify(payload)
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            // Handle response as needed.
+                        })
+                        .catch(error => console.error('Error submitting score:', error));
+                },
+
+                initEchoListeners() {
+                    if (window.Echo) {
+                        window.Echo.channel('highscores')
+                            .listen('HighscoreUpdated', event => this.globalHighscore = event.newHighscore);
+                    }
+                },
+
+                shareSocial() {
+                    const shareText =
+                        `🧠 Denník N mozgové cvičenie úspešne dokončené. 🏆 Moje dnešné 🐟 Slovosleď skóre je ${this.score} bodov. ✏️ Najdlhšie slovo? ${this.longestWord} písmen${this.longestWord < 5 ? 'á' : ''}!`;
+                    if (navigator.share) {
+                        navigator.share({
+                            title: 'Slovosleď',
+                            url: 'https://dennikn.sk/slovosled',
+                            text: shareText
+                        });
+                    } else {
+                        navigator.clipboard.writeText(shareText + '\nhttps://dennikn.sk/slovosled');
+                        this.quote = 'Výsledok úspešne skopírovaný do schránky (clipboard)';
+                    }
+                },
+
+                resetGame() {
+                    this.score = 0;
+                    this.selectedWord = '';
+                    this.message = '';
+                    this.submittedWords = new Set();
+                    this.submittedWordsIndexes = [];
+                    this.bonusUnlocked = false;
+                    this.gridCells.forEach(cell => {
+                        Object.assign(cell, {
+                            selected: false,
+                            value: 1,
+                            usageCount: 0,
+                            final: false
+                        });
+                    });
+                    this.longestWord = 0;
+                    this.wordsOpen = false;
+                    this.rulesOpen = false;
+                    this.gameTimeout = false;
+                    this.debouncedSaveState();
+                },
+
+                encodeWordIndexes(wordIndexes) {
+                    const indexPart = wordIndexes
+                        .map(i => i.toString(12).toUpperCase())
+                        .join('');
+                    const lenDigit = (wordIndexes.length - 1).toString(12).toUpperCase();
+                    const full = indexPart + lenDigit;
+                    return parseInt(full, 12);
+                }
+            }
+        }
+    </script>
+
+</body>
+
+</html>

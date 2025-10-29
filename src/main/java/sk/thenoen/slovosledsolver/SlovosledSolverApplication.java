@@ -41,11 +41,14 @@ public class SlovosledSolverApplication implements CommandLineRunner {
 		final HexFormat hexFormat = HexFormat.of();
 		//		final byte[] bytes = hexFormat.parseHex(hashes[0]);
 		//		final String hex = hexFormat.formatHex(bytes);
-//		final List<byte[]> hashesAsBytes = Arrays.stream(hashes)
-//												 .map(hexFormat::parseHex)
-//												 .toList();
+		//		final List<byte[]> hashesAsBytes = Arrays.stream(hashes)
+		//												 .map(hexFormat::parseHex)
+		//												 .toList();
 
-		final List<String> grid = pageParser.retrieveGrid();
+		//		final List<String> grid = pageParser.retrieveGrid();
+		final List<String> grid = pageParser.retrieveLetters().stream()
+											.map(l -> l.getLetter())
+											.toList();
 
 		final List<String> words = wordsFinder.findWords(grid, Set.of(hashes));
 
