@@ -4,13 +4,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.IntStream;
 
 import sk.thenoen.slovosledsolver.model.Tile;
 
@@ -68,7 +66,37 @@ public class Game {
 		return score;
 	}
 
-	public Map<String, List<List<Integer>>> findAllPossibleWordsSelections(Collection<String> words) {
+	public List<List<String>> generateAllPossibleWordCombinations(List<String> words) {
+		final Map<String, List<List<Integer>>> allPossibleWordsSelections = findAllPossibleWordsSelections(words);
+
+		List<List<String>> result = new ArrayList<>();
+		for (String word : words) {
+			final List<List<String>> allPossibleWordCombinations = findAllPossibleWordCombinations(new ArrayList<>(List.of(word)), 1, words);
+			result.addAll(allPossibleWordCombinations);
+		}
+
+		logger.info("Found {} possible word combinations", result.size());
+		return result;
+	}
+
+	private static List<List<String>> findAllPossibleWordCombinations(List<String> prefix, int index, List<String> words) {
+		if (index == 5) {
+			logger.debug("Found possible word combination: {}", prefix);
+			return List.of(prefix);
+		}
+
+		List<List<String>> result = new ArrayList<>();
+		for (String word : words) {
+			if (!prefix.contains(word)) {
+				List<String> newPrefix = new ArrayList<>(prefix);
+				newPrefix.add(word);
+				result.addAll(findAllPossibleWordCombinations(newPrefix, index + 1, words));
+			}
+		}
+		return result;
+	}
+
+	public Map<String, List<List<Integer>>> findAllPossibleWordsSelections(List<String> words) {
 		Map<String, List<List<Integer>>> wordSelections = new HashMap<>();
 		for (String word : words) {
 			wordSelections.put(word, findAllPossibleWordSelections(word));
@@ -98,8 +126,8 @@ public class Game {
 			logger.info("Found {} tiles with letter {}", tilesWithChar.size(), character);
 
 			possibleCharacterSelections.add(tilesWithChar.stream()
-																	.map(tiles::indexOf)
-																	.toList());
+														 .map(tiles::indexOf)
+														 .toList());
 		}
 
 		final List<List<Integer>> characterSelections = possibleCharacterSelections;
@@ -112,7 +140,7 @@ public class Game {
 		List<List<Integer>> uniqueWordSelections = new ArrayList<>();
 		for (List<Integer> wordSelection : wordSelections) {
 			final HashSet<Integer> uniqueCharacterIndices = new HashSet<>(wordSelection);
-			if(uniqueCharacterIndices.size() == wordSelection.size()) {
+			if (uniqueCharacterIndices.size() == wordSelection.size()) {
 				logger.info("Found unique word selection: {}", wordSelection);
 				uniqueWordSelections.add(wordSelection);
 			}

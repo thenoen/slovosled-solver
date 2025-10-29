@@ -128,4 +128,15 @@ class GameTest {
 		});
 
 	}
+
+	@Test
+	void generatingWordCombinations() {
+		final List<Tile> tiles = pageParser.retrieveLetters();
+		tiles.get(0).setLetter("L");
+
+		final Game game = new Game(tiles);
+
+		final List<List<String>> result = game.generateAllPossibleWordCombinations(List.of("ŠUPA", "LUPA", "LUPY", "LALU", "PELU", "PAŠU"));
+		Assertions.assertEquals(720, result.size());
+	}
 }
