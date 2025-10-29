@@ -91,6 +91,18 @@ public class GameGenerator {
 		logger.info("Found {} possible word combinations", wordCombinations.size());
 
 		final Map<List<String>, List<List<List<Integer>>>> wordSelectionCombinations = generateWordSelectionCombinations(wordCombinations, allPossibleWordsSelections);
+
+		wordSelectionCombinations.forEach((wordCombination, wordSelectionCombinationsForWordCombination) -> {
+			logger.debug("Game - words: {}", wordCombination);
+			wordSelectionCombinationsForWordCombination.forEach(wordSelectionCombination -> {
+				for (int i = 0; i < wordCombination.size(); i++) {
+					logger.debug("\t{}: {}", wordCombination.get(i), wordSelectionCombination.get(i));
+					//todo: generate new game??
+				}
+				logger.debug("---");
+			});
+		});
+
 		return wordSelectionCombinations;
 	}
 
