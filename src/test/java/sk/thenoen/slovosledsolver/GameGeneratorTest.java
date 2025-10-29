@@ -12,9 +12,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import sk.thenoen.slovosledsolver.model.Tile;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-class GameTest {
+class GameGeneratorTest {
 
 	static PageDownloader pageDownloader = Mockito.mock(PageDownloader.class);
 	static PageParser pageParser;
@@ -31,12 +29,12 @@ class GameTest {
 
 		final List<Tile> tiles = pageParser.retrieveLetters();
 
-		final Game game = new Game(tiles);
+		final GameGenerator gameGenerator = new GameGenerator(tiles);
 
-		long score = game.play(List.of("ŠUPA"));
+		long score = gameGenerator.play(List.of("ŠUPA"));
 		Assertions.assertEquals(16, score);
 
-		score = game.play(List.of("ŠUPA"));
+		score = gameGenerator.play(List.of("ŠUPA"));
 		Assertions.assertEquals(16, score);
 
 	}
@@ -46,12 +44,12 @@ class GameTest {
 
 		final List<Tile> tiles = pageParser.retrieveLetters();
 
-		final Game game = new Game(tiles);
+		final GameGenerator gameGenerator = new GameGenerator(tiles);
 
-		long score = game.play(List.of("ŠUPA"));
+		long score = gameGenerator.play(List.of("ŠUPA"));
 		Assertions.assertEquals(16, score);
 
-		score = game.play(List.of("ŠUPA"));
+		score = gameGenerator.play(List.of("ŠUPA"));
 		Assertions.assertEquals(16, score);
 
 	}
@@ -61,9 +59,9 @@ class GameTest {
 
 		final List<Tile> tiles = pageParser.retrieveLetters();
 
-		final Game game = new Game(tiles);
+		final GameGenerator gameGenerator = new GameGenerator(tiles);
 
-		long score = game.play(List.of("ŠUPA", "LUPA", "LUPY"));
+		long score = gameGenerator.play(List.of("ŠUPA", "LUPA", "LUPY"));
 		Assertions.assertEquals(80, score);
 
 	}
@@ -72,9 +70,9 @@ class GameTest {
 	void wordSelections() {
 		final List<Tile> tiles = pageParser.retrieveLetters();
 
-		final Game game = new Game(tiles);
+		final GameGenerator gameGenerator = new GameGenerator(tiles);
 
-		final List<List<Integer>> wordSelections = game.findAllPossibleWordSelections("ŠUPA");
+		final List<List<Integer>> wordSelections = gameGenerator.findAllPossibleWordSelections("ŠUPA");
 		Assertions.assertEquals(2, wordSelections.size());
 		Assertions.assertEquals(List.of(7, 4, 6, 9), wordSelections.get(0));
 		Assertions.assertEquals(List.of(7, 8, 6, 9), wordSelections.get(1));
@@ -85,9 +83,9 @@ class GameTest {
 		final List<Tile> tiles = pageParser.retrieveLetters();
 		tiles.get(0).setLetter("L");
 
-		final Game game = new Game(tiles);
+		final GameGenerator gameGenerator = new GameGenerator(tiles);
 
-		Map<String, List<List<Integer>>> result = game.findAllPossibleWordsSelections(List.of("ŠUPA", "LUPA", "LUPY", "LALA"));
+		Map<String, List<List<Integer>>> result = gameGenerator.findAllPossibleWordsSelections(List.of("ŠUPA", "LUPA", "LUPY", "LALA"));
 		Assertions.assertNotNull(result);
 
 		Assertions.assertEquals(2, result.get("ŠUPA").size());
@@ -117,9 +115,9 @@ class GameTest {
 		final List<Tile> tiles = pageParser.retrieveLetters();
 		tiles.get(0).setLetter("L");
 
-		final Game game = new Game(tiles);
+		final GameGenerator gameGenerator = new GameGenerator(tiles);
 
-		Map<String, List<List<Integer>>> result = game.findAllPossibleWordsSelections(List.of(testedWord));
+		Map<String, List<List<Integer>>> result = gameGenerator.findAllPossibleWordsSelections(List.of(testedWord));
 
 		final List<List<Integer>> lalaSelections = result.get(testedWord);
 		Assertions.assertEquals(4, lalaSelections.size());
@@ -134,9 +132,9 @@ class GameTest {
 		final List<Tile> tiles = pageParser.retrieveLetters();
 		tiles.get(0).setLetter("L");
 
-		final Game game = new Game(tiles);
+		final GameGenerator gameGenerator = new GameGenerator(tiles);
 
-		final List<List<String>> result = game.generateAllPossibleWordCombinations(List.of("ŠUPA", "LUPA", "LUPY", "LALU", "PELU", "PAŠU"));
+		final List<List<String>> result = gameGenerator.generateAllPossibleWordCombinations(List.of("ŠUPA", "LUPA", "LUPY", "LALU", "PELU", "PAŠU"));
 		Assertions.assertEquals(720, result.size());
 	}
 
@@ -145,9 +143,9 @@ class GameTest {
 		final List<Tile> tiles = pageParser.retrieveLetters();
 		tiles.get(0).setLetter("L");
 
-		final Game game = new Game(tiles);
+		final GameGenerator gameGenerator = new GameGenerator(tiles);
 
-		final Map<List<String>, List<List<List<Integer>>>> result = game.generateAllPossibleWordSelectionCombinations(
+		final Map<List<String>, List<List<List<Integer>>>> result = gameGenerator.generateAllPossibleWordSelectionCombinations(
 				List.of("ŠUPA", "LUPA", "LUPY", "LALU", "PELU", "PAŠU"));
 		Assertions.assertEquals(720, result.size());
 	}

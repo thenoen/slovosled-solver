@@ -12,13 +12,13 @@ import java.util.Map;
 
 import sk.thenoen.slovosledsolver.model.Tile;
 
-public class Game {
+public class GameGenerator {
 
-	private static final Logger logger = LoggerFactory.getLogger(Game.class);
+	private static final Logger logger = LoggerFactory.getLogger(GameGenerator.class);
 
 	private List<Tile> originalTiles;
 
-	public Game(List<Tile> originalTiles) {
+	public GameGenerator(List<Tile> originalTiles) {
 		this.originalTiles = originalTiles;
 	}
 
@@ -90,7 +90,8 @@ public class Game {
 
 		logger.info("Found {} possible word combinations", wordCombinations.size());
 
-		return generateWordSelectionCombinations(wordCombinations, allPossibleWordsSelections);
+		final Map<List<String>, List<List<List<Integer>>>> wordSelectionCombinations = generateWordSelectionCombinations(wordCombinations, allPossibleWordsSelections);
+		return wordSelectionCombinations;
 	}
 
 	public Map<List<String>, List<List<List<Integer>>>> generateWordSelectionCombinations(List<List<String>> wordCombinations,
