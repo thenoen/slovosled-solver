@@ -79,6 +79,53 @@ public class Game {
 		return result;
 	}
 
+	public Map<List<String>, List<List<List<Integer>>>> generateAllPossibleWordSelectionCombinations(List<String> words) {
+		List<List<String>> wordCombinations = new ArrayList<>();
+		for (String word : words) {
+			final List<List<String>> allPossibleWordCombinations = findAllPossibleWordCombinations(new ArrayList<>(List.of(word)), 1, words);
+			wordCombinations.addAll(allPossibleWordCombinations);
+		}
+
+		final Map<String, List<List<Integer>>> allPossibleWordsSelections = findAllPossibleWordsSelections(words);
+
+		logger.info("Found {} possible word combinations", wordCombinations.size());
+
+		return generateWordSelectionCombinations(wordCombinations, allPossibleWordsSelections);
+	}
+
+	public Map<List<String>, List<List<List<Integer>>>> generateWordSelectionCombinations(List<List<String>> wordCombinations,
+																					Map<String, List<List<Integer>>> allPossibleWordsSelections) {
+
+		Map<List<String>, List<List<List<Integer>>>> wordSelectionCombinations = new HashMap<>();
+
+		for (List<String> wordCombination : wordCombinations) {
+			wordSelectionCombinations.put(wordCombination,
+										  generateWordSelectionCombinations(new ArrayList<>(new ArrayList<>()), 0, wordCombination,
+																			allPossibleWordsSelections));
+		}
+
+		return wordSelectionCombinations;
+	}
+
+	private List<List<List<Integer>>> generateWordSelectionCombinations(List<List<Integer>> prefix,
+																  int index,
+																  List<String> wordCombination,
+																  Map<String, List<List<Integer>>> allPossibleWordsSelections) {
+		if (index == wordCombination.size()) {
+			return List.of(prefix);
+		}
+
+		List<List<List<Integer>>> result = new ArrayList<>();
+
+		final String word = wordCombination.get(index);
+		for (List<Integer> wordSelection : allPossibleWordsSelections.get(word)) {
+			List<List<Integer>> newPrefix = new ArrayList<>(prefix);
+			newPrefix.add(wordSelection);
+			result.addAll(generateWordSelectionCombinations(newPrefix, index + 1, wordCombination, allPossibleWordsSelections));
+		}
+		return result;
+	}
+
 	private static List<List<String>> findAllPossibleWordCombinations(List<String> prefix, int index, List<String> words) {
 		if (index == 5) {
 			logger.debug("Found possible word combination: {}", prefix);

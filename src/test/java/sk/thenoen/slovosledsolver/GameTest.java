@@ -139,4 +139,16 @@ class GameTest {
 		final List<List<String>> result = game.generateAllPossibleWordCombinations(List.of("ŠUPA", "LUPA", "LUPY", "LALU", "PELU", "PAŠU"));
 		Assertions.assertEquals(720, result.size());
 	}
+
+	@Test
+	void generateAllPossibleWordSelectionCombinations() {
+		final List<Tile> tiles = pageParser.retrieveLetters();
+		tiles.get(0).setLetter("L");
+
+		final Game game = new Game(tiles);
+
+		final Map<List<String>, List<List<List<Integer>>>> result = game.generateAllPossibleWordSelectionCombinations(
+				List.of("ŠUPA", "LUPA", "LUPY", "LALU", "PELU", "PAŠU"));
+		Assertions.assertEquals(720, result.size());
+	}
 }
