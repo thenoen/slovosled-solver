@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import java.util.List;
+import java.util.Map;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -41,7 +42,7 @@ class GameTest {
 	}
 
 	@Test
-	void towConsecutiveGames() {
+	void twoConsecutiveGames() {
 
 		final List<Tile> tiles = pageParser.retrieveLetters();
 
@@ -64,6 +65,67 @@ class GameTest {
 
 		long score = game.play(List.of("ŠUPA", "LUPA", "LUPY"));
 		Assertions.assertEquals(80, score);
+
+	}
+
+	@Test
+	void wordSelections() {
+		final List<Tile> tiles = pageParser.retrieveLetters();
+
+		final Game game = new Game(tiles);
+
+		final List<List<Integer>> wordSelections = game.findAllPossibleWordSelections("ŠUPA");
+		Assertions.assertEquals(2, wordSelections.size());
+		Assertions.assertEquals(List.of(7, 4, 6, 9), wordSelections.get(0));
+		Assertions.assertEquals(List.of(7, 8, 6, 9), wordSelections.get(1));
+	}
+
+	@Test
+	void play2() {
+		final List<Tile> tiles = pageParser.retrieveLetters();
+		tiles.get(0).setLetter("L");
+
+		final Game game = new Game(tiles);
+
+		Map<String, List<List<Integer>>> result = game.findAllPossibleWordsSelections(List.of("ŠUPA", "LUPA", "LUPY", "LALA"));
+		Assertions.assertNotNull(result);
+
+		Assertions.assertEquals(2, result.get("ŠUPA").size());
+		Assertions.assertEquals(List.of(7, 4, 6, 9), result.get("ŠUPA").get(0));
+		Assertions.assertEquals(List.of(7, 8, 6, 9), result.get("ŠUPA").get(1));
+
+		Assertions.assertEquals(4, result.get("LUPA").size());
+		Assertions.assertEquals(List.of(0, 4, 6, 9), result.get("LUPA").get(0));
+		Assertions.assertEquals(List.of(0, 8, 6, 9), result.get("LUPA").get(1));
+		Assertions.assertEquals(List.of(3, 4, 6, 9), result.get("LUPA").get(2));
+		Assertions.assertEquals(List.of(3, 8, 6, 9), result.get("LUPA").get(3));
+
+		Assertions.assertEquals(4, result.get("LUPY").size());
+		Assertions.assertEquals(List.of(0, 4, 6, 5), result.get("LUPY").get(0));
+		Assertions.assertEquals(List.of(0, 8, 6, 5), result.get("LUPY").get(1));
+		Assertions.assertEquals(List.of(3, 4, 6, 5), result.get("LUPY").get(2));
+		Assertions.assertEquals(List.of(3, 8, 6, 5), result.get("LUPY").get(3));
+
+		final List<List<Integer>> lalaSelections = result.get("LALA");
+		Assertions.assertEquals(0, lalaSelections.size());
+
+	}
+
+	@Test
+	void play2RepeatedLettersInWord() {
+		final String testedWord = "LALU";
+		final List<Tile> tiles = pageParser.retrieveLetters();
+		tiles.get(0).setLetter("L");
+
+		final Game game = new Game(tiles);
+
+		Map<String, List<List<Integer>>> result = game.findAllPossibleWordsSelections(List.of(testedWord));
+
+		final List<List<Integer>> lalaSelections = result.get(testedWord);
+		Assertions.assertEquals(4, lalaSelections.size());
+		lalaSelections.forEach(lalaSelection -> {
+			Assertions.assertEquals(4, lalaSelection.size());
+		});
 
 	}
 }
