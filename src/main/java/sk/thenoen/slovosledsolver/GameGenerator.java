@@ -2,6 +2,7 @@ package sk.thenoen.slovosledsolver;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -10,64 +11,16 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
+import sk.thenoen.slovosledsolver.model.Game;
 import sk.thenoen.slovosledsolver.model.Tile;
 
+@Component
 public class GameGenerator {
 
 	private static final Logger logger = LoggerFactory.getLogger(GameGenerator.class);
 
-	private List<Tile> originalTiles;
-
-	public GameGenerator(List<Tile> originalTiles) {
-		this.originalTiles = originalTiles;
-	}
-
-	public long play(List<String> words) {
-		long score = 0;
-		final List<Tile> tiles = originalTiles.stream()
-											  .map(Tile::copy)
-											  .toList();
-
-		for (String word : words) {
-
-			long wordSum = 0;
-
-			for (int i = 0; i < word.length(); i++) {
-
-				final String character = word.charAt(i) + "";
-				final List<Tile> tilesWithChar = tiles.stream()
-													  .filter(t -> t.getLetter().equals(character))
-													  .toList();
-				logger.info("Found {} tiles with letter {}", tilesWithChar.size(), character);
-
-				if (tilesWithChar.size() == 0) {
-					logger.error("No tiles with letter {} found! This is not expected", character);
-					throw new IllegalStateException("No tiles with letter " + character + " found!");
-				}
-
-				if (tilesWithChar.size() > 1) {
-					logger.warn("Found {} tiles with letter {}. Multiple combinations should be tested", tilesWithChar.size(), character);
-				}
-
-				final Tile tile = tilesWithChar.get(0);
-				wordSum += tile.getValue();
-				tile.incrementUsageCount();
-
-			}
-
-			final long wordScore = wordSum * word.length();
-			logger.info("{} - word score: {}", word, wordScore);
-			score += wordScore;
-
-			tiles.forEach(t -> t.setSelected(false));
-
-		}
-
-		return score;
-	}
-
-	public List<List<String>> generateAllPossibleWordCombinations(List<String> words) {
-		final Map<String, List<List<Integer>>> allPossibleWordsSelections = findAllPossibleWordsSelections(words);
+	public List<List<String>> generateAllPossibleWordCombinations(List<Tile> tiles, List<String> words) {
+		final Map<String, List<List<Integer>>> allPossibleWordsSelections = findAllPossibleWordsSelections(tiles, words);
 
 		List<List<String>> result = new ArrayList<>();
 		for (String word : words) {
@@ -79,35 +32,47 @@ public class GameGenerator {
 		return result;
 	}
 
-	public Map<List<String>, List<List<List<Integer>>>> generateAllPossibleWordSelectionCombinations(List<String> words) {
+	public Map<List<String>, List<List<List<Integer>>>> generateAllPossibleWordSelectionCombinations(List<Tile> tiles, List<String> words) {
 		List<List<String>> wordCombinations = new ArrayList<>();
 		for (String word : words) {
 			final List<List<String>> allPossibleWordCombinations = findAllPossibleWordCombinations(new ArrayList<>(List.of(word)), 1, words);
 			wordCombinations.addAll(allPossibleWordCombinations);
 		}
 
-		final Map<String, List<List<Integer>>> allPossibleWordsSelections = findAllPossibleWordsSelections(words);
+		final Map<String, List<List<Integer>>> allPossibleWordsSelections = findAllPossibleWordsSelections(tiles, words);
 
 		logger.info("Found {} possible word combinations", wordCombinations.size());
 
-		final Map<List<String>, List<List<List<Integer>>>> wordSelectionCombinations = generateWordSelectionCombinations(wordCombinations, allPossibleWordsSelections);
-
-		wordSelectionCombinations.forEach((wordCombination, wordSelectionCombinationsForWordCombination) -> {
-			logger.debug("Game - words: {}", wordCombination);
-			wordSelectionCombinationsForWordCombination.forEach(wordSelectionCombination -> {
-				for (int i = 0; i < wordCombination.size(); i++) {
-					logger.debug("\t{}: {}", wordCombination.get(i), wordSelectionCombination.get(i));
-					//todo: generate new game??
-				}
-				logger.debug("---");
-			});
-		});
+		final Map<List<String>, List<List<List<Integer>>>> wordSelectionCombinations = generateWordSelectionCombinations(wordCombinations,
+																														 allPossibleWordsSelections);
 
 		return wordSelectionCombinations;
 	}
 
+	public List<Game> generateAllPossibleGames(List<Tile> tiles, List<String> words) {
+
+		logger.info("Generating all possible games ...");
+
+		List<Game> games = new ArrayList<>();
+
+		final Map<List<String>, List<List<List<Integer>>>> wordSelectionCombinations = generateAllPossibleWordSelectionCombinations(tiles, words);
+
+		logger.info("Found {} possible word combinations", wordSelectionCombinations.size());
+
+		wordSelectionCombinations.forEach((wordCombination, wordSelectionCombinationsForWordCombination) -> {
+			wordSelectionCombinationsForWordCombination.forEach(wordSelectionCombination -> {
+				for (int i = 0; i < wordCombination.size(); i++) {
+					games.add(new Game(tiles, wordCombination, wordSelectionCombination));
+				}
+			});
+		});
+
+		logger.info("Generated {} possible games", games.size());
+		return games;
+	}
+
 	public Map<List<String>, List<List<List<Integer>>>> generateWordSelectionCombinations(List<List<String>> wordCombinations,
-																					Map<String, List<List<Integer>>> allPossibleWordsSelections) {
+																						  Map<String, List<List<Integer>>> allPossibleWordsSelections) {
 
 		Map<List<String>, List<List<List<Integer>>>> wordSelectionCombinations = new HashMap<>();
 
@@ -121,9 +86,9 @@ public class GameGenerator {
 	}
 
 	private List<List<List<Integer>>> generateWordSelectionCombinations(List<List<Integer>> prefix,
-																  int index,
-																  List<String> wordCombination,
-																  Map<String, List<List<Integer>>> allPossibleWordsSelections) {
+																		int index,
+																		List<String> wordCombination,
+																		Map<String, List<List<Integer>>> allPossibleWordsSelections) {
 		if (index == wordCombination.size()) {
 			return List.of(prefix);
 		}
@@ -156,20 +121,16 @@ public class GameGenerator {
 		return result;
 	}
 
-	public Map<String, List<List<Integer>>> findAllPossibleWordsSelections(List<String> words) {
+	public Map<String, List<List<Integer>>> findAllPossibleWordsSelections(List<Tile> tiles, List<String> words) {
 		Map<String, List<List<Integer>>> wordSelections = new HashMap<>();
 		for (String word : words) {
-			wordSelections.put(word, findAllPossibleWordSelections(word));
+			wordSelections.put(word, findAllPossibleWordSelections(tiles, word));
 		}
 
 		return wordSelections;
 	}
 
-	public List<List<Integer>> findAllPossibleWordSelections(String word) {
-
-		final List<Tile> tiles = originalTiles.stream()
-											  .map(Tile::copy)
-											  .toList();
+	public List<List<Integer>> findAllPossibleWordSelections(List<Tile> tiles, String word) {
 
 		logger.info("Letters: {}", tiles.stream()
 										.map(Tile::getLetter)

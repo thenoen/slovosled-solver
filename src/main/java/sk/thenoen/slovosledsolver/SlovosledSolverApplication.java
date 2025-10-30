@@ -12,9 +12,14 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HexFormat;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+
+import sk.thenoen.slovosledsolver.model.Game;
+import sk.thenoen.slovosledsolver.model.Tile;
 
 @SpringBootApplication
 public class SlovosledSolverApplication implements CommandLineRunner {
@@ -26,6 +31,9 @@ public class SlovosledSolverApplication implements CommandLineRunner {
 
 	@Resource
 	private WordsFinder wordsFinder;
+
+	@Resource
+	private GameGenerator gameGenerator;
 
 	public static void main(String[] args) {
 		SpringApplication.run(SlovosledSolverApplication.class, args);
@@ -46,9 +54,10 @@ public class SlovosledSolverApplication implements CommandLineRunner {
 		//												 .toList();
 
 		//		final List<String> grid = pageParser.retrieveGrid();
-		final List<String> grid = pageParser.retrieveLetters().stream()
-											.map(l -> l.getLetter())
-											.toList();
+		final List<Tile> tiles = pageParser.retrieveLetters();
+		final List<String> grid = tiles.stream()
+									   .map(l -> l.getLetter())
+									   .toList();
 
 		final List<String> words = wordsFinder.findWords(grid, Set.of(hashes));
 
@@ -69,6 +78,35 @@ public class SlovosledSolverApplication implements CommandLineRunner {
 			hashList.remove(hex);
 		}
 		hashList.forEach(h -> logger.info("remaining: {}", h));
+
+		final List<String> longestWords = words.stream()
+											   .sorted(Comparator.comparing(String::length).reversed())
+											   .filter(w -> w.length() > 4)
+											   .limit(50)
+											   .toList();
+
+		logger.info("Longest words {}: {}", longestWords.size(), longestWords);
+
+		List<Game> games = gameGenerator.generateAllPossibleGames(tiles, longestWords);
+
+
+		Game maxGame = null;
+		long progress = 0;
+
+		for (int i = 0; i < games.size(); i++) {
+			final Game game = games.get(i);
+			final long score = game.play();
+			if (maxGame == null || score > maxGame.getScore()) {
+				maxGame = game;
+			}
+			long newProgress = (i * 100) / games.size();
+			if (newProgress != progress) {
+				progress = newProgress;
+				logger.info("Progress: {} %", progress);
+			}
+		}
+
+		maxGame.printScore();
 
 		logger.info("SlovosledSolverApplication finished");
 	}

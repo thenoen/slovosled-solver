@@ -6,6 +6,7 @@ public class Tile {
 	private int value;
 	private int usageCount;
 	private boolean selected;
+	private boolean reachedMax = false;
 
 	//	public Letter(String letter, int value, int usageCount, boolean selected) {
 	//		super();
@@ -57,9 +58,18 @@ public class Tile {
 
 	public final void incrementUsageCount() {
 		usageCount++;
-		if (usageCount < 3) {
+		if (usageCount < 4 && !reachedMax) {
 			value++;
 		}
+		if (usageCount == 3) {
+			reachedMax = true;
+			value = 1;
+		}
 		selected = true;
+	}
+
+	@Override
+	public String toString() {
+		return letter + "(" + value + ")";
 	}
 }

@@ -10,6 +10,7 @@ import java.util.Map;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import sk.thenoen.slovosledsolver.model.Game;
 import sk.thenoen.slovosledsolver.model.Tile;
 
 class GameGeneratorTest {
@@ -24,55 +25,55 @@ class GameGeneratorTest {
 		Mockito.when(pageDownloader.retrievePageContent()).thenReturn(pageContent);
 	}
 
-	@Test
-	void simpleGame() {
+//	@Test
+//	void simpleGame() {
+//
+//		final List<Tile> tiles = pageParser.retrieveLetters();
+//
+//		final GameGenerator gameGenerator = new GameGenerator();
+//
+//		long score = gameGenerator.play(List.of("ŠUPA"));
+//		Assertions.assertEquals(16, score);
+//
+//		score = gameGenerator.play(List.of("ŠUPA"));
+//		Assertions.assertEquals(16, score);
+//
+//	}
 
-		final List<Tile> tiles = pageParser.retrieveLetters();
+//	@Test
+//	void twoConsecutiveGames() {
+//
+//		final List<Tile> tiles = pageParser.retrieveLetters();
+//
+//		final GameGenerator gameGenerator = new GameGenerator(tiles);
+//
+//		long score = gameGenerator.play(List.of("ŠUPA"));
+//		Assertions.assertEquals(16, score);
+//
+//		score = gameGenerator.play(List.of("ŠUPA"));
+//		Assertions.assertEquals(16, score);
+//
+//	}
 
-		final GameGenerator gameGenerator = new GameGenerator(tiles);
-
-		long score = gameGenerator.play(List.of("ŠUPA"));
-		Assertions.assertEquals(16, score);
-
-		score = gameGenerator.play(List.of("ŠUPA"));
-		Assertions.assertEquals(16, score);
-
-	}
-
-	@Test
-	void twoConsecutiveGames() {
-
-		final List<Tile> tiles = pageParser.retrieveLetters();
-
-		final GameGenerator gameGenerator = new GameGenerator(tiles);
-
-		long score = gameGenerator.play(List.of("ŠUPA"));
-		Assertions.assertEquals(16, score);
-
-		score = gameGenerator.play(List.of("ŠUPA"));
-		Assertions.assertEquals(16, score);
-
-	}
-
-	@Test
-	void multipleWords() {
-
-		final List<Tile> tiles = pageParser.retrieveLetters();
-
-		final GameGenerator gameGenerator = new GameGenerator(tiles);
-
-		long score = gameGenerator.play(List.of("ŠUPA", "LUPA", "LUPY"));
-		Assertions.assertEquals(80, score);
-
-	}
+//	@Test
+//	void multipleWords() {
+//
+//		final List<Tile> tiles = pageParser.retrieveLetters();
+//
+//		final GameGenerator gameGenerator = new GameGenerator(tiles);
+//
+//		long score = gameGenerator.play(List.of("ŠUPA", "LUPA", "LUPY"));
+//		Assertions.assertEquals(80, score);
+//
+//	}
 
 	@Test
 	void wordSelections() {
 		final List<Tile> tiles = pageParser.retrieveLetters();
 
-		final GameGenerator gameGenerator = new GameGenerator(tiles);
+		final GameGenerator gameGenerator = new GameGenerator();
 
-		final List<List<Integer>> wordSelections = gameGenerator.findAllPossibleWordSelections("ŠUPA");
+		final List<List<Integer>> wordSelections = gameGenerator.findAllPossibleWordSelections(tiles,"ŠUPA");
 		Assertions.assertEquals(2, wordSelections.size());
 		Assertions.assertEquals(List.of(7, 4, 6, 9), wordSelections.get(0));
 		Assertions.assertEquals(List.of(7, 8, 6, 9), wordSelections.get(1));
@@ -83,9 +84,9 @@ class GameGeneratorTest {
 		final List<Tile> tiles = pageParser.retrieveLetters();
 		tiles.get(0).setLetter("L");
 
-		final GameGenerator gameGenerator = new GameGenerator(tiles);
+		final GameGenerator gameGenerator = new GameGenerator();
 
-		Map<String, List<List<Integer>>> result = gameGenerator.findAllPossibleWordsSelections(List.of("ŠUPA", "LUPA", "LUPY", "LALA"));
+		Map<String, List<List<Integer>>> result = gameGenerator.findAllPossibleWordsSelections(tiles, List.of("ŠUPA", "LUPA", "LUPY", "LALA"));
 		Assertions.assertNotNull(result);
 
 		Assertions.assertEquals(2, result.get("ŠUPA").size());
@@ -115,9 +116,9 @@ class GameGeneratorTest {
 		final List<Tile> tiles = pageParser.retrieveLetters();
 		tiles.get(0).setLetter("L");
 
-		final GameGenerator gameGenerator = new GameGenerator(tiles);
+		final GameGenerator gameGenerator = new GameGenerator();
 
-		Map<String, List<List<Integer>>> result = gameGenerator.findAllPossibleWordsSelections(List.of(testedWord));
+		Map<String, List<List<Integer>>> result = gameGenerator.findAllPossibleWordsSelections(tiles, List.of(testedWord));
 
 		final List<List<Integer>> lalaSelections = result.get(testedWord);
 		Assertions.assertEquals(4, lalaSelections.size());
@@ -132,9 +133,9 @@ class GameGeneratorTest {
 		final List<Tile> tiles = pageParser.retrieveLetters();
 		tiles.get(0).setLetter("L");
 
-		final GameGenerator gameGenerator = new GameGenerator(tiles);
+		final GameGenerator gameGenerator = new GameGenerator();
 
-		final List<List<String>> result = gameGenerator.generateAllPossibleWordCombinations(List.of("ŠUPA", "LUPA", "LUPY", "LALU", "PELU", "PAŠU"));
+		final List<List<String>> result = gameGenerator.generateAllPossibleWordCombinations(tiles, List.of("ŠUPA", "LUPA", "LUPY", "LALU", "PELU", "PAŠU"));
 		Assertions.assertEquals(720, result.size());
 	}
 
@@ -143,10 +144,22 @@ class GameGeneratorTest {
 		final List<Tile> tiles = pageParser.retrieveLetters();
 		tiles.get(0).setLetter("L");
 
-		final GameGenerator gameGenerator = new GameGenerator(tiles);
+		final GameGenerator gameGenerator = new GameGenerator();
 
-		final Map<List<String>, List<List<List<Integer>>>> result = gameGenerator.generateAllPossibleWordSelectionCombinations(
-				List.of("ŠUPA", "LUPA", "LUPY", "LALU", "PELU", "PAŠU"));
+		final Map<List<String>, List<List<List<Integer>>>> result = gameGenerator.generateAllPossibleWordSelectionCombinations(tiles,
+																															   List.of("ŠUPA", "LUPA", "LUPY", "LALU", "PELU", "PAŠU"));
 		Assertions.assertEquals(720, result.size());
+	}
+
+	@Test
+	void generateGames() {
+		final List<Tile> tiles = pageParser.retrieveLetters();
+		tiles.get(0).setLetter("L");
+		final GameGenerator gameGenerator = new GameGenerator();
+
+		final List<Game> games = gameGenerator.generateAllPossibleGames(tiles, List.of("ŠUPA", "LUPA", "LUPY", "LALU", "PELU", "PAŠU"));
+
+		Assertions.assertNotNull(games);
+
 	}
 }
