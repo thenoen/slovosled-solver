@@ -42,11 +42,10 @@ public class GameGenerator {
 
 		logger.info("Generating all possible word selections ...");
 		final Map<String, List<List<Integer>>> allPossibleWordsSelections = findAllPossibleWordsSelections(tiles, words);
-		logger.info("Found {} possible word selections", allPossibleWordsSelections.size());
+		logger.info("Generated all possible word selections finished", allPossibleWordsSelections.size());
 
 		logger.info("Generating all possible word selection combinations ...");
-		final Map<List<String>, List<List<List<Integer>>>> wordSelectionCombinations = generateWordSelectionCombinations(wordCombinations,
-																														 allPossibleWordsSelections);
+		final var wordSelectionCombinations = generateWordSelectionCombinations(wordCombinations, allPossibleWordsSelections); // todo: optimize memory
 		logger.info("Found {} possible word selection combinations", wordSelectionCombinations.size());
 
 		return wordSelectionCombinations;
@@ -136,8 +135,8 @@ public class GameGenerator {
 	public List<List<Integer>> findAllPossibleWordSelections(List<Tile> tiles, String word) {
 
 		logger.debug("Letters: {}", tiles.stream()
-										.map(Tile::getLetter)
-										.toList());
+										 .map(Tile::getLetter)
+										 .toList());
 
 		List<List<Integer>> possibleCharacterSelections = new ArrayList<>();
 
