@@ -33,15 +33,21 @@ public class GameGenerator {
 
 	public Map<List<String>, List<List<List<Integer>>>> generateAllPossibleWordSelectionCombinations(List<Tile> tiles, List<String> words) {
 		List<List<String>> wordCombinations = new ArrayList<>();
+		logger.info("Generating all possible word combinations ...");
 		for (String word : words) {
 			final List<List<String>> allPossibleWordCombinations = findAllPossibleWordCombinations(new ArrayList<>(List.of(word)), 1, words);
 			wordCombinations.addAll(allPossibleWordCombinations);
 		}
+		logger.info("Found {} possible word combinations", wordCombinations.size());
 
+		logger.info("Generating all possible word selections ...");
 		final Map<String, List<List<Integer>>> allPossibleWordsSelections = findAllPossibleWordsSelections(tiles, words);
+		logger.info("Found {} possible word selections", allPossibleWordsSelections.size());
 
+		logger.info("Generating all possible word selection combinations ...");
 		final Map<List<String>, List<List<List<Integer>>>> wordSelectionCombinations = generateWordSelectionCombinations(wordCombinations,
 																														 allPossibleWordsSelections);
+		logger.info("Found {} possible word selection combinations", wordSelectionCombinations.size());
 
 		return wordSelectionCombinations;
 	}
