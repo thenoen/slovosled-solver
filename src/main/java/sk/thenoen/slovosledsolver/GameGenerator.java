@@ -20,7 +20,6 @@ public class GameGenerator {
 	private static final Logger logger = LoggerFactory.getLogger(GameGenerator.class);
 
 	public List<List<String>> generateAllPossibleWordCombinations(List<Tile> tiles, List<String> words) {
-		final Map<String, List<List<Integer>>> allPossibleWordsSelections = findAllPossibleWordsSelections(tiles, words);
 
 		List<List<String>> result = new ArrayList<>();
 		for (String word : words) {
@@ -40,8 +39,6 @@ public class GameGenerator {
 		}
 
 		final Map<String, List<List<Integer>>> allPossibleWordsSelections = findAllPossibleWordsSelections(tiles, words);
-
-		logger.info("Found {} possible word combinations", wordCombinations.size());
 
 		final Map<List<String>, List<List<List<Integer>>>> wordSelectionCombinations = generateWordSelectionCombinations(wordCombinations,
 																														 allPossibleWordsSelections);
@@ -132,7 +129,7 @@ public class GameGenerator {
 
 	public List<List<Integer>> findAllPossibleWordSelections(List<Tile> tiles, String word) {
 
-		logger.info("Letters: {}", tiles.stream()
+		logger.debug("Letters: {}", tiles.stream()
 										.map(Tile::getLetter)
 										.toList());
 
@@ -144,7 +141,7 @@ public class GameGenerator {
 			final List<Tile> tilesWithChar = tiles.stream()
 												  .filter(t -> t.getLetter().equals(character))
 												  .toList();
-			logger.info("Found {} tiles with letter {}", tilesWithChar.size(), character);
+			logger.debug("Found {} tiles with letter {}", tilesWithChar.size(), character);
 
 			possibleCharacterSelections.add(tilesWithChar.stream()
 														 .map(tiles::indexOf)
@@ -155,14 +152,14 @@ public class GameGenerator {
 		final List<List<Integer>> wordSelections = findAllPossibleWordSelections(Collections.emptyList(), 0, characterSelections);
 
 		for (List<Integer> integers : wordSelections) {
-			logger.info("Found possible word selection: {}", integers);
+			logger.debug("Found possible word selection: {}", integers);
 		}
 
 		List<List<Integer>> uniqueWordSelections = new ArrayList<>();
 		for (List<Integer> wordSelection : wordSelections) {
 			final HashSet<Integer> uniqueCharacterIndices = new HashSet<>(wordSelection);
 			if (uniqueCharacterIndices.size() == wordSelection.size()) {
-				logger.info("Found unique word selection: {}", wordSelection);
+				logger.debug("Found unique word selection: {}", wordSelection);
 				uniqueWordSelections.add(wordSelection);
 			}
 		}

@@ -8,7 +8,7 @@
 
   <Loggers>
     <!-- More verbose logging for the project classes during tests -->
-    <Logger name="sk.thenoen.slovosledsolver" level="INFO" additivity="false">
+    <Logger name="sk.thenoen.slovosledsolver" level="DEBUG" additivity="false">
       <AppenderRef ref="Console"/>
     </Logger>
 

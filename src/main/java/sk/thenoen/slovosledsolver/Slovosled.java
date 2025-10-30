@@ -26,31 +26,10 @@ import java.util.regex.Pattern;
 public class Slovosled {
 
 	private static final List<String> WORD_HASHES = new ArrayList<>();
-	public static final String HASHES_CACHE_LOCATION = "/tmp/slovosled-hashes-cache.txt";
-	public static final String GRID_CACHE_LOCATION = "/tmp/slovosled-grid-cache.txt";
 	private static MessageDigest DIGEST = null;
 
 	private static Set<String> foundWords = new HashSet<>();
 
-//	static void main(String[] args) {
-//
-//		try {
-//
-	//			DIGEST = MessageDigest.getInstance("SHA-256");
-//
-//		} catch (NoSuchAlgorithmException ex) {
-//			ex.printStackTrace();
-//		}
-//
-//		List<String> hashes = getHashes();
-//		System.out.println("Number of hashes: " + hashes.size());
-//		WORD_HASHES.addAll(hashes);
-//
-//		List<Character> grid = parseGrid();
-//		System.out.println("Grid letters: " + grid);
-//
-//		variations(grid);
-//	}
 
 	private static List<String> getHashes() {
 		String hashesCacheLocation = "/tmp/slovosled-hashes-cache.txt";
