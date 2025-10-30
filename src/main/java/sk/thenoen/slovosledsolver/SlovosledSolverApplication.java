@@ -93,6 +93,9 @@ public class SlovosledSolverApplication implements CommandLineRunner {
 		Game maxGame = null;
 		long progress = 0;
 
+		logger.info("Number of games to play: {}", games.size());
+		logger.info("Playing games ...");
+
 		for (int i = 0; i < games.size(); i++) {
 			final Game game = games.get(i);
 			final long score = game.play();
