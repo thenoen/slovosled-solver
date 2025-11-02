@@ -85,7 +85,7 @@ public class SlovosledSolverApplication implements CommandLineRunner {
 											   .limit(50)
 											   .toList();
 
-		logger.info("Longest words {}: {}", longestWords.size(), longestWords);
+		logger.debug("Longest words {}: {}", longestWords.size(), longestWords);
 
 		List<Game> games = gameGenerator.generateAllPossibleGames(tiles, longestWords);
 

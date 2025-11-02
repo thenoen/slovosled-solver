@@ -16,6 +16,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Future;
 
+import sk.thenoen.slovosledsolver.util.CacheUtils;
+
 @Component
 public class WordsFinder {
 
@@ -80,6 +82,15 @@ public class WordsFinder {
 
 		logger.info("Finding words ...");
 
+		try {
+			final List<String> strings = CacheUtils.readCachedWords();
+			if (!strings.isEmpty()) {
+				return strings;
+			}
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+
 		List<String> foundWords = Collections.synchronizedList(new ArrayList<>(hashes.size()));
 
 		for (int i = 0; i < alphabet.size(); i++) {
@@ -94,7 +105,9 @@ public class WordsFinder {
 		uniqueWords.addAll(foundWords);
 
 		logger.info("Finding words finished");
-		return List.of(uniqueWords.toArray(new String[0]));
+		final List<String> uniqueWordList = uniqueWords.stream().toList();
+		CacheUtils.cacheWords(uniqueWordList);
+		return uniqueWordList;
 	}
 
 	private static void variations(List<String> prefix,
