@@ -79,13 +79,14 @@ public class SlovosledSolverApplication implements CommandLineRunner {
 		}
 		hashList.forEach(h -> logger.info("remaining: {}", h));
 
+		int maxWordLength = 7;
 		final List<String> longestWords = words.stream()
 											   .sorted(Comparator.comparing(String::length).reversed())
-											   .filter(w -> w.length() > 4)
-											   .limit(50)
+											   .filter(w -> w.length() > maxWordLength)
+//											   .limit(50)
 											   .toList();
 
-		logger.debug("Longest words {}: {}", longestWords.size(), longestWords);
+		logger.info("Selected {} words longer than {} characters for games", longestWords.size(), maxWordLength);
 
 		List<Game> games = gameGenerator.generateAllPossibleGames(tiles, longestWords);
 

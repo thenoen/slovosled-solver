@@ -19,9 +19,13 @@ public class GameGenerator {
 
 	private static final Logger logger = LoggerFactory.getLogger(GameGenerator.class);
 
-	public List<List<String>> generateAllPossibleWordCombinations(List<String> words) {
+	public List<List<Short>> generateAllPossibleWordCombinations(List<String> words) {
 
-		List<List<String>> result = findAllPossibleWordCombinations(new ArrayList<>(), 0, words);
+		List<Short> wordIndices = new ArrayList<>();
+		for (int i = 0; i < words.size(); i++) {
+			wordIndices.add((short) i);
+		}
+		List<List<Short>> result = findAllPossibleWordCombinationsUsingIndices(new ArrayList<>(), 0, wordIndices);
 
 		logger.info("Found {} possible word combinations", result.size());
 		return result;
@@ -30,9 +34,15 @@ public class GameGenerator {
 	public Map<List<String>, List<List<List<Integer>>>> generateAllPossibleWordSelectionCombinations(List<Tile> tiles, List<String> words) {
 
 		logger.info("Generating all possible word combinations ...");
+		List<Short> wordIndices = new ArrayList<>();
+		for (int i = 0; i < words.size(); i++) {
+			wordIndices.add((short) i);
+		}
 		List<List<String>> wordCombinations = findAllPossibleWordCombinations(new ArrayList<>(), 0, words);
+		List<List<Short>> wordIndexCombinations = findAllPossibleWordCombinationsUsingIndices(new ArrayList<>(), 0, wordIndices);
 
 		logger.info("Found {} possible word combinations", wordCombinations.size());
+		logger.info("Found {} possible word combinations using indices", wordIndexCombinations.size());
 
 		logger.info("Generating all possible word selections ...");
 		final Map<String, List<List<Integer>>> allPossibleWordsSelections = findAllPossibleWordsSelections(tiles, words);
@@ -57,9 +67,7 @@ public class GameGenerator {
 
 		wordSelectionCombinations.forEach((wordCombination, wordSelectionCombinationsForWordCombination) -> {
 			wordSelectionCombinationsForWordCombination.forEach(wordSelectionCombination -> {
-				for (int i = 0; i < wordCombination.size(); i++) {
 					games.add(new Game(tiles, wordCombination, wordSelectionCombination));
-				}
 			});
 		});
 
@@ -114,6 +122,25 @@ public class GameGenerator {
 				List<String> newWords = new ArrayList<>(words);
 				newWords.remove(word);
 				result.addAll(findAllPossibleWordCombinations(newPrefix, index + 1, newWords));
+			}
+		}
+		return result;
+	}
+
+	private static List<List<Short>> findAllPossibleWordCombinationsUsingIndices(List<Short> prefix, int index, List<Short> wordIndices) {
+		if (index == 5) {
+			logger.debug("Found possible word combination: {}", prefix);
+			return List.of(prefix);
+		}
+
+		List<List<Short>> result = new ArrayList<>();
+		for (Short wordIndex : wordIndices) {
+			if (!prefix.contains(wordIndex)) {
+				List<Short> newPrefix = new ArrayList<>(prefix);
+				newPrefix.add(wordIndex);
+				List<Short> newWords = new ArrayList<>(wordIndices);
+				newWords.remove(wordIndex);
+				result.addAll(findAllPossibleWordCombinationsUsingIndices(newPrefix, index + 1, newWords));
 			}
 		}
 		return result;
