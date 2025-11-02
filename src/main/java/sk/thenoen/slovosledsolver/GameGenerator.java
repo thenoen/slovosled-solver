@@ -19,25 +19,19 @@ public class GameGenerator {
 
 	private static final Logger logger = LoggerFactory.getLogger(GameGenerator.class);
 
-	public List<List<String>> generateAllPossibleWordCombinations(List<Tile> tiles, List<String> words) {
+	public List<List<String>> generateAllPossibleWordCombinations(List<String> words) {
 
-		List<List<String>> result = new ArrayList<>();
-		for (String word : words) {
-			final List<List<String>> allPossibleWordCombinations = findAllPossibleWordCombinations(new ArrayList<>(List.of(word)), 1, words);
-			result.addAll(allPossibleWordCombinations);
-		}
+		List<List<String>> result = findAllPossibleWordCombinations(new ArrayList<>(), 0, words);
 
 		logger.info("Found {} possible word combinations", result.size());
 		return result;
 	}
 
 	public Map<List<String>, List<List<List<Integer>>>> generateAllPossibleWordSelectionCombinations(List<Tile> tiles, List<String> words) {
-		List<List<String>> wordCombinations = new ArrayList<>();
+
 		logger.info("Generating all possible word combinations ...");
-		for (String word : words) {
-			final List<List<String>> allPossibleWordCombinations = findAllPossibleWordCombinations(new ArrayList<>(List.of(word)), 1, words);
-			wordCombinations.addAll(allPossibleWordCombinations);
-		}
+		List<List<String>> wordCombinations = findAllPossibleWordCombinations(new ArrayList<>(), 0, words);
+
 		logger.info("Found {} possible word combinations", wordCombinations.size());
 
 		logger.info("Generating all possible word selections ...");
@@ -117,7 +111,9 @@ public class GameGenerator {
 			if (!prefix.contains(word)) {
 				List<String> newPrefix = new ArrayList<>(prefix);
 				newPrefix.add(word);
-				result.addAll(findAllPossibleWordCombinations(newPrefix, index + 1, words));
+				List<String> newWords = new ArrayList<>(words);
+				newWords.remove(word);
+				result.addAll(findAllPossibleWordCombinations(newPrefix, index + 1, newWords));
 			}
 		}
 		return result;

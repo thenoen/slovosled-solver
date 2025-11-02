@@ -130,12 +130,9 @@ class GameGeneratorTest {
 
 	@Test
 	void generatingWordCombinations() {
-		final List<Tile> tiles = pageParser.retrieveLetters();
-		tiles.get(0).setLetter("L");
-
 		final GameGenerator gameGenerator = new GameGenerator();
 
-		final List<List<String>> result = gameGenerator.generateAllPossibleWordCombinations(tiles, List.of("ŠUPA", "LUPA", "LUPY", "LALU", "PELU", "PAŠU"));
+		final List<List<String>> result = gameGenerator.generateAllPossibleWordCombinations(List.of("ŠUPA", "LUPA", "LUPY", "LALU", "PELU", "PAŠU"));
 		Assertions.assertEquals(720, result.size());
 	}
 
