@@ -71,7 +71,7 @@ class GameGeneratorTest {
 	void wordSelections() {
 		final List<Tile> tiles = pageParser.retrieveLetters();
 
-		final GameGenerator gameGenerator = new GameGenerator();
+		final GameGenerator gameGenerator = new GameGenerator(new DataStorage("/tmp"));
 
 		final List<List<Integer>> wordSelections = gameGenerator.findAllPossibleWordSelections(tiles,"ŠUPA");
 		Assertions.assertEquals(2, wordSelections.size());
@@ -84,7 +84,7 @@ class GameGeneratorTest {
 		final List<Tile> tiles = pageParser.retrieveLetters();
 		tiles.get(0).setLetter("L");
 
-		final GameGenerator gameGenerator = new GameGenerator();
+		final GameGenerator gameGenerator = new GameGenerator(new DataStorage("/tmp"));
 
 		Map<String, List<List<Integer>>> result = gameGenerator.findAllPossibleWordsSelections(tiles, List.of("ŠUPA", "LUPA", "LUPY", "LALA"));
 		Assertions.assertNotNull(result);
@@ -116,7 +116,7 @@ class GameGeneratorTest {
 		final List<Tile> tiles = pageParser.retrieveLetters();
 		tiles.get(0).setLetter("L");
 
-		final GameGenerator gameGenerator = new GameGenerator();
+		final GameGenerator gameGenerator = new GameGenerator(new DataStorage("/tmp"));
 
 		Map<String, List<List<Integer>>> result = gameGenerator.findAllPossibleWordsSelections(tiles, List.of(testedWord));
 
@@ -130,7 +130,7 @@ class GameGeneratorTest {
 
 	@Test
 	void generatingWordCombinations() {
-		final GameGenerator gameGenerator = new GameGenerator();
+		final GameGenerator gameGenerator = new GameGenerator(new DataStorage("/tmp"));
 
 		final List<List<Short>> result = gameGenerator.generateAllPossibleWordCombinations(List.of("ŠUPA", "LUPA", "LUPY", "LALU", "PELU", "PAŠU"));
 		Assertions.assertEquals(720, result.size());
@@ -141,7 +141,7 @@ class GameGeneratorTest {
 		final List<Tile> tiles = pageParser.retrieveLetters();
 		tiles.get(0).setLetter("L");
 
-		final GameGenerator gameGenerator = new GameGenerator();
+		final GameGenerator gameGenerator = new GameGenerator(new DataStorage("/tmp"));
 
 		final Map<List<String>, List<List<List<Integer>>>> result = gameGenerator.generateAllPossibleWordSelectionCombinations(tiles,
 																															   List.of("ŠUPA", "LUPA", "LUPY", "LALU", "PELU", "PAŠU"));
@@ -152,7 +152,7 @@ class GameGeneratorTest {
 	void generateGames() {
 		final List<Tile> tiles = pageParser.retrieveLetters();
 		tiles.get(0).setLetter("L");
-		final GameGenerator gameGenerator = new GameGenerator();
+		final GameGenerator gameGenerator = new GameGenerator(new DataStorage("/tmp"));
 
 		final List<Game> games = gameGenerator.generateAllPossibleGames(tiles, List.of("ŠUPA", "LUPA", "LUPY", "LALU", "PELU", "PAŠU"));
 

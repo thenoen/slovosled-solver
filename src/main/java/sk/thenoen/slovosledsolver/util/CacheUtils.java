@@ -2,6 +2,8 @@ package sk.thenoen.slovosledsolver.util;
 
 import org.slf4j.Logger;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.util.List;
 
 public class CacheUtils {
@@ -12,7 +14,7 @@ public class CacheUtils {
 
 	public static void cacheWords(List<String> words) {
 		logger.info("Caching words...");
-		try (var writer = new java.io.BufferedWriter(new java.io.FileWriter(WORDS_CACHE_LOCATION, true))) {
+		try (var writer = new BufferedWriter(new FileWriter(WORDS_CACHE_LOCATION, true))) {
 			for (String word : words) {
 				writer.write(word);
 				writer.newLine();

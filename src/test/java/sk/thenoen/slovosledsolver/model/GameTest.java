@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import sk.thenoen.slovosledsolver.DataStorage;
 import sk.thenoen.slovosledsolver.GameGenerator;
 import sk.thenoen.slovosledsolver.PageDownloader;
 import sk.thenoen.slovosledsolver.PageParser;
@@ -33,7 +34,7 @@ class GameTest {
 		final List<Tile> tiles = pageParser.retrieveLetters();
 		tiles.get(0).setLetter("L");
 
-		GameGenerator gameGenerator = new GameGenerator();
+		GameGenerator gameGenerator = new GameGenerator(new DataStorage("/tmp"));
 		final Map<List<String>, List<List<List<Integer>>>> wordSelectionCombinations = gameGenerator.generateAllPossibleWordSelectionCombinations(tiles, words);
 
 		final List<String> wordsCombination = wordSelectionCombinations.keySet().stream().findFirst().get();
