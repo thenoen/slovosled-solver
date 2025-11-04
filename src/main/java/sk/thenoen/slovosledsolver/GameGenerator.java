@@ -41,6 +41,13 @@ public class GameGenerator {
 		List<List<String>> wordCombinations = findAllPossibleWordCombinations(new ArrayList<>(), 0, words);
 		List<List<Short>> wordIndexCombinations = findAllPossibleWordCombinationsUsingIndices(new ArrayList<>(), 0, wordIndices);
 
+//		try {
+//			logger.info("Time to get Heap Dump");
+//			Thread.sleep(10000);
+//		} catch (InterruptedException e) {
+//			throw new RuntimeException(e);
+//		}
+
 		logger.info("Found {} possible word combinations", wordCombinations.size());
 		logger.info("Found {} possible word combinations using indices", wordIndexCombinations.size());
 

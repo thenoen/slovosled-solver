@@ -17,6 +17,8 @@ import java.util.HexFormat;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import sk.thenoen.slovosledsolver.model.Game;
 import sk.thenoen.slovosledsolver.model.Tile;
@@ -79,17 +81,26 @@ public class SlovosledSolverApplication implements CommandLineRunner {
 		}
 		hashList.forEach(h -> logger.info("remaining: {}", h));
 
-		int maxWordLength = 7;
-		final List<String> longestWords = words.stream()
-											   .sorted(Comparator.comparing(String::length).reversed())
-											   .filter(w -> w.length() > maxWordLength)
-//											   .limit(50)
-											   .toList();
+		final Map<Integer, List<String>> wordsByLength = words.stream().collect(Collectors.groupingBy(String::length));
+		final List<Integer> wordLengths = wordsByLength.keySet()
+													   .stream()
+													   .sorted(Comparator.comparingInt(Integer::intValue).reversed())
+													   .collect(Collectors.toList());
+		List<String> selectedWords = new ArrayList<>();
+		for (int i = 0; i < wordLengths.size(); i++) {
+			if (selectedWords.size() < 50) {
+				final Integer wordsLength = wordLengths.get(i);
+				final List<String> wordsWithLength = wordsByLength.get(wordsLength);
+				selectedWords.addAll(wordsWithLength);
+				logger.info("Selected {} words with length {} characters", wordsWithLength.size(), wordsLength);
+			} else {
+				break;
+			}
+		}
 
-		logger.info("Selected {} words longer than {} characters for games", longestWords.size(), maxWordLength);
+		logger.info("Selected {} words for games", selectedWords.size());
 
-		List<Game> games = gameGenerator.generateAllPossibleGames(tiles, longestWords);
-
+		List<Game> games = gameGenerator.generateAllPossibleGames(tiles, selectedWords);
 
 		Game maxGame = null;
 		long progress = 0;
