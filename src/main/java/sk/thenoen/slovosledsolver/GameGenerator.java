@@ -45,7 +45,9 @@ public class GameGenerator {
 			wordIndices.add((short) i);
 		}
 		List<List<Short>> wordIndexCombinations = findAllPossibleWordCombinationsUsingIndices(new ArrayList<>(), 0, wordIndices);
+		dataStorage.flushCacheToDisk();
 		List<List<String>> wordCombinations = findAllPossibleWordCombinations(new ArrayList<>(), 0, words);
+		dataStorage.flushIndexCacheToDisk();
 
 		logger.info("Found {} possible word combinations", wordCombinations.size());
 		logger.info("Found {} possible word combinations using indices", wordIndexCombinations.size());

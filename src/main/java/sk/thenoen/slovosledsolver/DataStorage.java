@@ -59,7 +59,7 @@ public class DataStorage {
 		}
 	}
 
-	private void flushCacheToDisk() {
+	public void flushCacheToDisk() {
 
 		try (var fileWriter = new FileWriter(wordCombinationsCacheLocation, true);
 			 var bufferedWriter = new BufferedWriter(fileWriter, 100 * MB)) {
@@ -75,7 +75,7 @@ public class DataStorage {
 
 	}
 
-	private void flushIndexCacheToDisk() {
+	public void flushIndexCacheToDisk() {
 
 		try (var fileWriter = new FileWriter(wordIndexCombinationsCacheLocation, true);
 			 var bufferedWriter = new BufferedWriter(fileWriter, 100 * MB)) {
