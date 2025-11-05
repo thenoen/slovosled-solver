@@ -2,8 +2,13 @@ package sk.thenoen.slovosledsolver;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
 import java.util.Map;
@@ -13,10 +18,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import sk.thenoen.slovosledsolver.model.Game;
 import sk.thenoen.slovosledsolver.model.Tile;
 
+@ExtendWith(MockitoExtension.class)
 class GameGeneratorTest {
 
 	static PageDownloader pageDownloader = Mockito.mock(PageDownloader.class);
 	static PageParser pageParser;
+	private DataStorage dataStorageMock;
+
+	@Captor
+	private ArgumentCaptor<List<String>> wordListCaptor;
 
 	@BeforeAll
 	static void setUp() {
@@ -24,6 +34,12 @@ class GameGeneratorTest {
 		String pageContent = TestUtils.loadPageContent();
 		Mockito.when(pageDownloader.retrievePageContent()).thenReturn(pageContent);
 	}
+	
+	@BeforeEach
+	public void initDataStorage() {
+		dataStorageMock = Mockito.mock(DataStorage.class);
+	}
+
 
 //	@Test
 //	void simpleGame() {
@@ -71,12 +87,15 @@ class GameGeneratorTest {
 	void wordSelections() {
 		final List<Tile> tiles = pageParser.retrieveLetters();
 
-		final GameGenerator gameGenerator = new GameGenerator(new DataStorage("/tmp"));
+		final GameGenerator gameGenerator = new GameGenerator(dataStorageMock);
 
 		final List<List<Integer>> wordSelections = gameGenerator.findAllPossibleWordSelections(tiles,"ŠUPA");
+
+		Mockito.verify(dataStorageMock, Mockito.times(2)).storeWordCombination(wordListCaptor.capture());
+
 		Assertions.assertEquals(2, wordSelections.size());
-		Assertions.assertEquals(List.of(7, 4, 6, 9), wordSelections.get(0));
-		Assertions.assertEquals(List.of(7, 8, 6, 9), wordSelections.get(1));
+		Assertions.assertEquals(List.of(7, 4, 6, 9), wordListCaptor.getAllValues().get(0));
+		Assertions.assertEquals(List.of(7, 8, 6, 9), wordListCaptor.getAllValues().get(1));
 	}
 
 	@Test
@@ -84,7 +103,7 @@ class GameGeneratorTest {
 		final List<Tile> tiles = pageParser.retrieveLetters();
 		tiles.get(0).setLetter("L");
 
-		final GameGenerator gameGenerator = new GameGenerator(new DataStorage("/tmp"));
+		final GameGenerator gameGenerator = new GameGenerator(dataStorageMock);
 
 		Map<String, List<List<Integer>>> result = gameGenerator.findAllPossibleWordsSelections(tiles, List.of("ŠUPA", "LUPA", "LUPY", "LALA"));
 		Assertions.assertNotNull(result);
@@ -116,7 +135,7 @@ class GameGeneratorTest {
 		final List<Tile> tiles = pageParser.retrieveLetters();
 		tiles.get(0).setLetter("L");
 
-		final GameGenerator gameGenerator = new GameGenerator(new DataStorage("/tmp"));
+		final GameGenerator gameGenerator = new GameGenerator(dataStorageMock);
 
 		Map<String, List<List<Integer>>> result = gameGenerator.findAllPossibleWordsSelections(tiles, List.of(testedWord));
 
@@ -130,7 +149,7 @@ class GameGeneratorTest {
 
 	@Test
 	void generatingWordCombinations() {
-		final GameGenerator gameGenerator = new GameGenerator(new DataStorage("/tmp"));
+		final GameGenerator gameGenerator = new GameGenerator(dataStorageMock);
 
 		final List<List<Short>> result = gameGenerator.generateAllPossibleWordCombinations(List.of("ŠUPA", "LUPA", "LUPY", "LALU", "PELU", "PAŠU"));
 		Assertions.assertEquals(720, result.size());
@@ -141,10 +160,16 @@ class GameGeneratorTest {
 		final List<Tile> tiles = pageParser.retrieveLetters();
 		tiles.get(0).setLetter("L");
 
-		final GameGenerator gameGenerator = new GameGenerator(new DataStorage("/tmp"));
+		final GameGenerator gameGenerator = new GameGenerator(dataStorageMock);
 
 		final Map<List<String>, List<List<List<Integer>>>> result = gameGenerator.generateAllPossibleWordSelectionCombinations(tiles,
 																															   List.of("ŠUPA", "LUPA", "LUPY", "LALU", "PELU", "PAŠU"));
+		Mockito.verify(dataStorageMock, Mockito.times(720)).storeWordCombination(wordListCaptor.capture());
+
+//		Assertions.assertEquals(2, wordSelections.size());
+		Assertions.assertEquals(List.of(7, 4, 6, 9), wordListCaptor.getAllValues().get(0));
+		Assertions.assertEquals(List.of(7, 8, 6, 9), wordListCaptor.getAllValues().get(1));
+
 		Assertions.assertEquals(720, result.size());
 	}
 
@@ -152,7 +177,7 @@ class GameGeneratorTest {
 	void generateGames() {
 		final List<Tile> tiles = pageParser.retrieveLetters();
 		tiles.get(0).setLetter("L");
-		final GameGenerator gameGenerator = new GameGenerator(new DataStorage("/tmp"));
+		final GameGenerator gameGenerator = new GameGenerator(dataStorageMock);
 
 		final List<Game> games = gameGenerator.generateAllPossibleGames(tiles, List.of("ŠUPA", "LUPA", "LUPY", "LALU", "PELU", "PAŠU"));
 

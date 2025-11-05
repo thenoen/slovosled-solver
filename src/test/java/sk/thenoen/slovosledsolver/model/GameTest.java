@@ -17,14 +17,20 @@ import sk.thenoen.slovosledsolver.TestUtils;
 
 class GameTest {
 
-	static PageDownloader pageDownloader = Mockito.mock(PageDownloader.class);
-	static PageParser pageParser;
+	private static PageDownloader pageDownloader = Mockito.mock(PageDownloader.class);
+	private static PageParser pageParser;
+
+	private DataStorage dataStorageMock;
 
 	@BeforeAll
 	static void setUp() {
 		pageParser = new PageParser(pageDownloader, new ObjectMapper());
 		String pageContent = TestUtils.loadPageContent();
 		Mockito.when(pageDownloader.retrievePageContent()).thenReturn(pageContent);
+	}
+
+	private void initDataStorage() {
+		dataStorageMock = Mockito.mock(DataStorage.class);
 	}
 
 	@Test
@@ -34,7 +40,7 @@ class GameTest {
 		final List<Tile> tiles = pageParser.retrieveLetters();
 		tiles.get(0).setLetter("L");
 
-		GameGenerator gameGenerator = new GameGenerator(new DataStorage("/tmp"));
+		GameGenerator gameGenerator = new GameGenerator(dataStorageMock);
 		final Map<List<String>, List<List<List<Integer>>>> wordSelectionCombinations = gameGenerator.generateAllPossibleWordSelectionCombinations(tiles, words);
 
 		final List<String> wordsCombination = wordSelectionCombinations.keySet().stream().findFirst().get();

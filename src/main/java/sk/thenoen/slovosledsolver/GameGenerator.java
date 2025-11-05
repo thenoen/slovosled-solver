@@ -44,18 +44,11 @@ public class GameGenerator {
 		for (int i = 0; i < words.size(); i++) {
 			wordIndices.add((short) i);
 		}
+		List<List<Short>> wordIndexCombinations = findAllPossibleWordCombinationsUsingIndices(new ArrayList<>(), 0, wordIndices);
 		List<List<String>> wordCombinations = findAllPossibleWordCombinations(new ArrayList<>(), 0, words);
-//		List<List<Short>> wordIndexCombinations = findAllPossibleWordCombinationsUsingIndices(new ArrayList<>(), 0, wordIndices);
-
-//		try {
-//			logger.info("Time to get Heap Dump");
-//			Thread.sleep(10000);
-//		} catch (InterruptedException e) {
-//			throw new RuntimeException(e);
-//		}
 
 		logger.info("Found {} possible word combinations", wordCombinations.size());
-//		logger.info("Found {} possible word combinations using indices", wordIndexCombinations.size());
+		logger.info("Found {} possible word combinations using indices", wordIndexCombinations.size());
 
 		logger.info("Generating all possible word selections ...");
 		final Map<String, List<List<Integer>>> allPossibleWordsSelections = findAllPossibleWordsSelections(tiles, words);
@@ -142,10 +135,12 @@ public class GameGenerator {
 		return result;
 	}
 
-	private static List<List<Short>> findAllPossibleWordCombinationsUsingIndices(List<Short> prefix, int index, List<Short> wordIndices) {
+	private List<List<Short>> findAllPossibleWordCombinationsUsingIndices(List<Short> prefix, int index, List<Short> wordIndices) {
 		if (index == 5) {
 			logger.debug("Found possible word combination: {}", prefix);
-			return List.of(prefix);
+			dataStorage.storeWordIndexCombination(prefix);
+			//			return List.of(prefix);
+			return Collections.emptyList();
 		}
 
 		List<List<Short>> result = new ArrayList<>();
