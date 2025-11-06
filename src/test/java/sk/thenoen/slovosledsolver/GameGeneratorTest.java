@@ -147,13 +147,13 @@ class GameGeneratorTest {
 
 	}
 
-	@Test
-	void generatingWordCombinations() {
-		final GameGenerator gameGenerator = new GameGenerator(dataStorageMock);
-
-		final List<List<Short>> result = gameGenerator.generateAllPossibleWordCombinations(List.of("ŠUPA", "LUPA", "LUPY", "LALU", "PELU", "PAŠU"));
-		Assertions.assertEquals(720, result.size());
-	}
+//	@Test
+//	void generatingWordCombinations() {
+//		final GameGenerator gameGenerator = new GameGenerator(dataStorageMock);
+//
+//		final List<List<Short>> result = gameGenerator.generateAllPossibleWordCombinations(List.of("ŠUPA", "LUPA", "LUPY", "LALU", "PELU", "PAŠU"));
+//		Assertions.assertEquals(720, result.size());
+//	}
 
 	@Test
 	void generateAllPossibleWordSelectionCombinations() {

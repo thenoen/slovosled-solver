@@ -8,28 +8,38 @@ import org.springframework.stereotype.Component;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Component
 public class DataStorage {
 
 	private static final Logger logger = LoggerFactory.getLogger(DataStorage.class);
+
 	private static final List<List<String>> WORD_COMBINATIONS_CACHE = new ArrayList<>();
 	private static final List<List<Short>> WORD_INDEX_COMBINATIONS_CACHE = new ArrayList<>();
+	private static final List<String> WORDS_SELECTION_COMBINATION_CACHE = new ArrayList<>();
+
 	public static final int MB = 1024 * 1024;
 
 	private final String wordCombinationsCacheLocation;
 	private final String wordIndexCombinationsCacheLocation;
+	private final String wordsSelectionCombinationCacheLocation;
 
 	public DataStorage(@Value("${data.storage.location}") String dataStorageLocation) {
 		wordCombinationsCacheLocation = dataStorageLocation + "/word-combinations-cache.txt";
-		initWordCombinationCacheFile(wordCombinationsCacheLocation);
-
+		//		initWordCombinationCacheFile(wordCombinationsCacheLocation);
+		//
 		wordIndexCombinationsCacheLocation = dataStorageLocation + "/word-index-combinations-cache.txt";
 		initWordCombinationCacheFile(wordIndexCombinationsCacheLocation);
 
+		wordsSelectionCombinationCacheLocation = dataStorageLocation + "/words-selection-combination-cache.txt";
+		initWordCombinationCacheFile(wordsSelectionCombinationCacheLocation);
 	}
 
 	private void initWordCombinationCacheFile(String location) {
@@ -92,5 +102,49 @@ public class DataStorage {
 			throw new RuntimeException("Unable to store word combinations to disk", e);
 		}
 
+	}
+
+	public Stream<String> readWordIndexCombinationsFromDisk() {
+		try {
+			return Files.lines(Paths.get(wordIndexCombinationsCacheLocation));
+		} catch (IOException e) {
+			logger.error("Unable to read word combinations from disk", e);
+		}
+		return Stream.empty();
+	}
+
+	public void saveWorsSelectionCombination(List<Short> wordIndices, List<List<Integer>> wordSelections) {
+
+		StringBuilder sb = new StringBuilder();
+		wordIndices.forEach(i -> sb.append(i).append(","));
+		sb.append(":");
+
+		sb.append(wordSelections.stream()
+								.map(wordSelection -> wordSelection.stream()
+																   .map(String::valueOf)
+																   .collect(Collectors.joining(",")))
+								.collect(Collectors.joining(";")));
+
+		WORDS_SELECTION_COMBINATION_CACHE.add(sb.toString());
+		logger.debug("Saving word selection combination: {} (cache size: {})", sb, WORDS_SELECTION_COMBINATION_CACHE.size());
+		if (WORDS_SELECTION_COMBINATION_CACHE.size() > 1_000_000) {
+			flushWordsSelectionCombinationCacheToDisk();
+		}
+
+	}
+
+	public void flushWordsSelectionCombinationCacheToDisk() {
+		try (var fileWriter = new FileWriter(wordsSelectionCombinationCacheLocation, true);
+			 var bufferedWriter = new BufferedWriter(fileWriter, 100 * MB)) {
+
+			for (String wordSelectionCombination : WORDS_SELECTION_COMBINATION_CACHE) {
+				bufferedWriter.write(wordSelectionCombination);
+				bufferedWriter.newLine();
+			}
+			bufferedWriter.flush();
+			WORDS_SELECTION_COMBINATION_CACHE.clear();
+		} catch (Exception e) {
+			throw new RuntimeException("Unable to store word combinations to disk", e);
+		}
 	}
 }
