@@ -9,10 +9,12 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
+import com.fasterxml.jackson.databind.ser.impl.WritableObjectId;
 import sk.thenoen.slovosledsolver.model.Game;
 import sk.thenoen.slovosledsolver.model.Tile;
 
@@ -46,7 +48,9 @@ public class GameGenerator {
 		logger.info("Generated all possible word selections finished");
 
 		logger.info("Generating all possible word selection combinations ...");
-		final var wordSelectionCombinations = generateWordSelectionCombinations(words, allPossibleWordsSelections); // todo: instead of generating combinations start playing games
+		final var wordSelectionCombinations = generateWordSelectionCombinations(words,
+																				tiles,
+																				allPossibleWordsSelections); // todo: instead of generating combinations start playing games
 		logger.info("Found {} possible word selection combinations", wordSelectionCombinations.size());
 
 		return wordSelectionCombinations;
@@ -64,7 +68,8 @@ public class GameGenerator {
 
 		wordSelectionCombinations.forEach((wordCombination, wordSelectionCombinationsForWordCombination) -> {
 			wordSelectionCombinationsForWordCombination.forEach(wordSelectionCombination -> {
-				games.add(new Game(tiles, wordCombination, wordSelectionCombination));
+				final Game game = new Game(tiles, wordCombination, wordSelectionCombination);
+				games.add(game);
 			});
 		});
 
@@ -73,20 +78,61 @@ public class GameGenerator {
 	}
 
 	public Map<List<String>, List<List<List<Integer>>>> generateWordSelectionCombinations(List<String> words,
+																						  List<Tile> tiles,
 																						  Map<String, List<List<Integer>>> allPossibleWordsSelections) {
 
-		Map<List<String>, List<List<List<Integer>>>> wordSelectionCombinations = new HashMap<>();
+//		Map<List<String>, List<List<List<Integer>>>> wordSelectionCombinations = new HashMap<>();
 
 		// todo: load 'wordCombinations' from DataStorage
 		final Stream<String> wordIndexCombinationStream = dataStorage.readWordIndexCombinationsFromDisk();
-		wordIndexCombinationStream.forEach(wordIndexCombination -> generateWordSelectionCombinations(
-				0,
-				words,
-				Arrays.stream(wordIndexCombination.split(",")).map(Short::parseShort).toList(),
-				new ArrayList<>(new ArrayList<>()),
-				allPossibleWordsSelections));
-		dataStorage.flushWordsSelectionCombinationCacheToDisk();
-		return wordSelectionCombinations;
+
+		long bestScore = 0;
+
+		final Iterator<String> iterator = wordIndexCombinationStream.iterator();
+		while (iterator.hasNext()) {
+			final String wordIndexCombination = iterator.next();
+			final List<Short> indicesOfSelectedWords = Arrays.stream(wordIndexCombination.split(","))
+										   .map(Short::parseShort)
+										   .toList();
+			final List<List<List<Integer>>> wordSelectionCombinations = generateWordSelectionCombinations(
+					0,
+					words,
+					indicesOfSelectedWords,
+					new ArrayList<>(new ArrayList<>()), allPossibleWordsSelections);
+
+			if (wordSelectionCombinations == null) {
+				continue;
+			}
+
+//			logger.info("Found {} possible word selection combinations for word combination {}", wordSelectionCombinations.size(), wordIndexCombination);
+
+			for (List<List<Integer>> wordSelectionCombination : wordSelectionCombinations) {
+				final List<String> selectedWords = indicesOfSelectedWords.stream()
+																.map(wordIndex -> words.get(wordIndex))
+																.toList();
+				final Game game = new Game(tiles, selectedWords, wordSelectionCombination);
+				final long score = game.play();
+				if(score > bestScore) {
+					bestScore = score;
+					logger.info("Found best score: {} for word combination {}", bestScore, wordIndexCombination);
+				}
+			}
+
+		}
+
+//		wordIndexCombinationStream.map(wordIndexCombination -> generateWordSelectionCombinations(
+//										  0,
+//										  words,
+//										  Arrays.stream(wordIndexCombination.split(","))
+//												.map(Short::parseShort)
+//												.toList(),
+//										  new ArrayList<>(new ArrayList<>()), allPossibleWordsSelections))
+//
+//								  .flatMap(List::stream)
+//								  .forEach(wSC -> new Game(tiles, null, wSC));
+
+		dataStorage.flushWordsSelectionCombinationCacheToDisk(); //todo: play Game instead
+		return null;
 	}
 
 	private List<List<List<Integer>>> generateWordSelectionCombinations(int index,

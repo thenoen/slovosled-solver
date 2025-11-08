@@ -88,7 +88,7 @@ public class SlovosledSolverApplication implements CommandLineRunner {
 													   .collect(Collectors.toList());
 		List<String> selectedWords = new ArrayList<>();
 		for (int i = 0; i < wordLengths.size(); i++) {
-			if (selectedWords.size() < 10) {
+			if (selectedWords.size() < 20) {
 				final Integer wordsLength = wordLengths.get(i);
 				final List<String> wordsWithLength = wordsByLength.get(wordsLength);
 				selectedWords.addAll(wordsWithLength);
