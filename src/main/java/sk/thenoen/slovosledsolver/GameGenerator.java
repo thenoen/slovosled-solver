@@ -81,19 +81,27 @@ public class GameGenerator {
 																						  List<Tile> tiles,
 																						  Map<String, List<List<Integer>>> allPossibleWordsSelections) {
 
-//		Map<List<String>, List<List<List<Integer>>>> wordSelectionCombinations = new HashMap<>();
+		//		Map<List<String>, List<List<List<Integer>>>> wordSelectionCombinations = new HashMap<>();
 
 		// todo: load 'wordCombinations' from DataStorage
 		final Stream<String> wordIndexCombinationStream = dataStorage.readWordIndexCombinationsFromDisk();
 
+		long wordIndexCombinationCount = 1;
+
+		for (int i = 0; i < 5; i++) {
+			wordIndexCombinationCount *= words.size() - i;
+		}
+
 		long bestScore = 0;
 
+		long currentIndex = 0;
+		long progress = -1;
 		final Iterator<String> iterator = wordIndexCombinationStream.iterator();
 		while (iterator.hasNext()) {
 			final String wordIndexCombination = iterator.next();
 			final List<Short> indicesOfSelectedWords = Arrays.stream(wordIndexCombination.split(","))
-										   .map(Short::parseShort)
-										   .toList();
+															 .map(Short::parseShort)
+															 .toList();
 			final List<List<List<Integer>>> wordSelectionCombinations = generateWordSelectionCombinations(
 					0,
 					words,
@@ -104,32 +112,39 @@ public class GameGenerator {
 				continue;
 			}
 
-//			logger.info("Found {} possible word selection combinations for word combination {}", wordSelectionCombinations.size(), wordIndexCombination);
+			//			logger.info("Found {} possible word selection combinations for word combination {}", wordSelectionCombinations.size(), wordIndexCombination);
 
+			currentIndex++;
 			for (List<List<Integer>> wordSelectionCombination : wordSelectionCombinations) {
 				final List<String> selectedWords = indicesOfSelectedWords.stream()
-																.map(wordIndex -> words.get(wordIndex))
-																.toList();
+																		 .map(wordIndex -> words.get(wordIndex))
+																		 .toList();
 				final Game game = new Game(tiles, selectedWords, wordSelectionCombination);
 				final long score = game.play();
-				if(score > bestScore) {
+				if (score > bestScore) {
 					bestScore = score;
 					logger.info("Found best score: {} for word combination {}", bestScore, wordIndexCombination);
 				}
 			}
 
+			long newProgress = (currentIndex * 100) / wordIndexCombinationCount;
+			if (newProgress != progress || progress == -1) {
+				logger.info("Progress: {} %", newProgress);
+				progress = newProgress;
+			}
+
 		}
 
-//		wordIndexCombinationStream.map(wordIndexCombination -> generateWordSelectionCombinations(
-//										  0,
-//										  words,
-//										  Arrays.stream(wordIndexCombination.split(","))
-//												.map(Short::parseShort)
-//												.toList(),
-//										  new ArrayList<>(new ArrayList<>()), allPossibleWordsSelections))
-//
-//								  .flatMap(List::stream)
-//								  .forEach(wSC -> new Game(tiles, null, wSC));
+		//		wordIndexCombinationStream.map(wordIndexCombination -> generateWordSelectionCombinations(
+		//										  0,
+		//										  words,
+		//										  Arrays.stream(wordIndexCombination.split(","))
+		//												.map(Short::parseShort)
+		//												.toList(),
+		//										  new ArrayList<>(new ArrayList<>()), allPossibleWordsSelections))
+		//
+		//								  .flatMap(List::stream)
+		//								  .forEach(wSC -> new Game(tiles, null, wSC));
 
 		dataStorage.flushWordsSelectionCombinationCacheToDisk(); //todo: play Game instead
 		return null;
