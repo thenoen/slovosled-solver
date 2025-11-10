@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import com.fasterxml.jackson.databind.ser.impl.WritableObjectId;
 import sk.thenoen.slovosledsolver.model.Game;
 import sk.thenoen.slovosledsolver.model.Tile;
 
@@ -29,7 +28,7 @@ public class GameGenerator {
 		this.dataStorage = dataStorage;
 	}
 
-	public Map<List<String>, List<List<List<Integer>>>> generateAllPossibleWordSelectionCombinations(List<Tile> tiles, List<String> words) {
+	public Map<String, List<List<Integer>>> generateAllPossibleWordSelectionCombinations(List<Tile> tiles, List<String> words) {
 
 		logger.info("Generating all possible word combinations ...");
 		List<Short> wordIndices = new ArrayList<>();
@@ -46,54 +45,20 @@ public class GameGenerator {
 		logger.info("Generating all possible word selections ...");
 		final Map<String, List<List<Integer>>> allPossibleWordsSelections = findAllPossibleWordsSelections(tiles, words);
 		logger.info("Generated all possible word selections finished");
-
-		logger.info("Generating all possible word selection combinations ...");
-		final var wordSelectionCombinations = generateWordSelectionCombinations(words,
-																				tiles,
-																				allPossibleWordsSelections); // todo: instead of generating combinations start playing games
-		logger.info("Found {} possible word selection combinations", wordSelectionCombinations.size());
-
-		return wordSelectionCombinations;
-	}
-
-	public List<Game> generateAllPossibleGames(List<Tile> tiles, List<String> words) {
-
-		logger.info("Generating all possible games ...");
-
-		List<Game> games = new ArrayList<>();
-
-		final Map<List<String>, List<List<List<Integer>>>> wordSelectionCombinations = generateAllPossibleWordSelectionCombinations(tiles, words);
-
-		logger.info("Found {} possible word combinations", wordSelectionCombinations.size());
-
-		wordSelectionCombinations.forEach((wordCombination, wordSelectionCombinationsForWordCombination) -> {
-			wordSelectionCombinationsForWordCombination.forEach(wordSelectionCombination -> {
-				final Game game = new Game(tiles, wordCombination, wordSelectionCombination);
-				games.add(game);
-			});
-		});
-
-		logger.info("Generated {} possible games", games.size());
-		return games;
+		return allPossibleWordsSelections;
 	}
 
 	public Map<List<String>, List<List<List<Integer>>>> generateWordSelectionCombinations(List<String> words,
 																						  List<Tile> tiles,
 																						  Map<String, List<List<Integer>>> allPossibleWordsSelections) {
-
-		//		Map<List<String>, List<List<List<Integer>>>> wordSelectionCombinations = new HashMap<>();
-
-		// todo: load 'wordCombinations' from DataStorage
 		final Stream<String> wordIndexCombinationStream = dataStorage.readWordIndexCombinationsFromDisk();
 
 		long wordIndexCombinationCount = 1;
-
 		for (int i = 0; i < 5; i++) {
 			wordIndexCombinationCount *= words.size() - i;
 		}
 
 		long bestScore = 0;
-
 		long currentIndex = 0;
 		long progress = -1;
 		final Iterator<String> iterator = wordIndexCombinationStream.iterator();
@@ -106,21 +71,18 @@ public class GameGenerator {
 					0,
 					words,
 					indicesOfSelectedWords,
-					new ArrayList<>(new ArrayList<>()), allPossibleWordsSelections);
-
-			if (wordSelectionCombinations == null) {
-				continue;
-			}
-
+					new ArrayList<>(new ArrayList<>()),
+					allPossibleWordsSelections);
 			//			logger.info("Found {} possible word selection combinations for word combination {}", wordSelectionCombinations.size(), wordIndexCombination);
 
 			currentIndex++;
 			for (List<List<Integer>> wordSelectionCombination : wordSelectionCombinations) {
 				final List<String> selectedWords = indicesOfSelectedWords.stream()
-																		 .map(wordIndex -> words.get(wordIndex))
+																		 .map(words::get)
 																		 .toList();
 				final Game game = new Game(tiles, selectedWords, wordSelectionCombination);
 				final long score = game.play();
+
 				if (score > bestScore) {
 					bestScore = score;
 					logger.info("Found best score: {} for word combination {}", bestScore, wordIndexCombination);
@@ -132,21 +94,9 @@ public class GameGenerator {
 				logger.info("Progress: {} %", newProgress);
 				progress = newProgress;
 			}
-
 		}
 
-		//		wordIndexCombinationStream.map(wordIndexCombination -> generateWordSelectionCombinations(
-		//										  0,
-		//										  words,
-		//										  Arrays.stream(wordIndexCombination.split(","))
-		//												.map(Short::parseShort)
-		//												.toList(),
-		//										  new ArrayList<>(new ArrayList<>()), allPossibleWordsSelections))
-		//
-		//								  .flatMap(List::stream)
-		//								  .forEach(wSC -> new Game(tiles, null, wSC));
-
-		dataStorage.flushWordsSelectionCombinationCacheToDisk(); //todo: play Game instead
+		dataStorage.flushWordsSelectionCombinationCacheToDisk();
 		return null;
 	}
 
@@ -156,8 +106,6 @@ public class GameGenerator {
 																		List<List<Integer>> prefix,
 																		Map<String, List<List<Integer>>> allPossibleWordsSelections) {
 		if (index == wordIndexCombination.size()) {
-			//todo: save to disk
-			dataStorage.saveWorsSelectionCombination(wordIndexCombination, prefix);
 			return List.of(prefix);
 		}
 
@@ -168,27 +116,6 @@ public class GameGenerator {
 			List<List<Integer>> newPrefix = new ArrayList<>(prefix);
 			newPrefix.add(wordSelection);
 			result.addAll(generateWordSelectionCombinations(index + 1, words, wordIndexCombination, newPrefix, allPossibleWordsSelections));
-		}
-		return result;
-	}
-
-	private List<List<String>> findAllPossibleWordCombinations(List<String> prefix, int index, List<String> words) {
-		if (index == 5) {
-			logger.debug("Found possible word combination: {}", prefix);
-			dataStorage.storeWordCombination(prefix);
-			//			return List.of(prefix);
-			return Collections.emptyList();
-		}
-
-		List<List<String>> result = new ArrayList<>();
-		for (String word : words) {
-			if (!prefix.contains(word)) {
-				List<String> newPrefix = new ArrayList<>(prefix);
-				newPrefix.add(word);
-				List<String> newWords = new ArrayList<>(words);
-				newWords.remove(word);
-				result.addAll(findAllPossibleWordCombinations(newPrefix, index + 1, newWords));
-			}
 		}
 		return result;
 	}

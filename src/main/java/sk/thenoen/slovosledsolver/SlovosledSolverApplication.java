@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HexFormat;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -36,6 +37,9 @@ public class SlovosledSolverApplication implements CommandLineRunner {
 
 	@Resource
 	private GameGenerator gameGenerator;
+
+	@Resource
+	private DataStorage dataStorage;
 
 	public static void main(String[] args) {
 		SpringApplication.run(SlovosledSolverApplication.class, args);
@@ -100,29 +104,82 @@ public class SlovosledSolverApplication implements CommandLineRunner {
 
 		logger.info("Selected {} words for games", selectedWords.size());
 
-		List<Game> games = gameGenerator.generateAllPossibleGames(tiles, selectedWords);
+		Map<String, List<List<Integer>>> allPossibleWordSelectionCombinations = gameGenerator.generateAllPossibleWordSelectionCombinations(tiles,
+																																		   selectedWords);
 
-		Game maxGame = null;
-		long progress = 0;
+		playGames(selectedWords, tiles, allPossibleWordSelectionCombinations);
 
-		logger.info("Number of games to play: {}", games.size());
-		logger.info("Playing games ...");
+		logger.info("SlovosledSolverApplication finished");
+	}
 
-		for (int i = 0; i < games.size(); i++) {
-			final Game game = games.get(i);
-			final long score = game.play();
-			if (maxGame == null || score > maxGame.getScore()) {
-				maxGame = game;
+	public Map<List<String>, List<List<List<Integer>>>> playGames(List<String> words,
+																  List<Tile> tiles,
+																  Map<String, List<List<Integer>>> allPossibleWordsSelections) {
+		final Stream<String> wordIndexCombinationStream = dataStorage.readWordIndexCombinationsFromDisk();
+
+		long wordIndexCombinationCount = 1;
+		for (int i = 0; i < 5; i++) {
+			wordIndexCombinationCount *= words.size() - i;
+		}
+
+		long bestScore = 0;
+		long currentIndex = 0;
+		long progress = -1;
+		final Iterator<String> iterator = wordIndexCombinationStream.iterator();
+		while (iterator.hasNext()) {
+			final String wordIndexCombination = iterator.next();
+			final List<Short> indicesOfSelectedWords = Arrays.stream(wordIndexCombination.split(","))
+															 .map(Short::parseShort)
+															 .toList();
+			final List<List<List<Integer>>> wordSelectionCombinations = generateWordSelectionCombinations(0,
+																										  words,
+																										  indicesOfSelectedWords,
+																										  new ArrayList<>(new ArrayList<>()),
+																										  allPossibleWordsSelections);
+			//			logger.info("Found {} possible word selection combinations for word combination {}", wordSelectionCombinations.size(), wordIndexCombination);
+
+			currentIndex++;
+			for (List<List<Integer>> wordSelectionCombination : wordSelectionCombinations) {
+				final List<String> selectedWords = indicesOfSelectedWords.stream()
+																		 .map(words::get)
+																		 .toList();
+				final Game game = new Game(tiles, selectedWords, wordSelectionCombination);
+				final long score = game.play();
+
+				if (score > bestScore) {
+					bestScore = score;
+//					logger.info("Found best score: {} for word combination {}", bestScore, selectedWords);
+					logger.info("Found best score: {} for word combination {}", bestScore, wordIndexCombination);
+				}
 			}
-			long newProgress = (i * 100) / games.size();
-			if (newProgress != progress) {
+
+			long newProgress = (currentIndex * 100) / wordIndexCombinationCount;
+			if (newProgress != progress || progress == -1) {
+				logger.info("Progress: {} %", newProgress);
 				progress = newProgress;
-				logger.info("Progress: {} %", progress);
 			}
 		}
 
-		maxGame.printScore();
+		return null;
+	}
 
-		logger.info("SlovosledSolverApplication finished");
+	private List<List<List<Integer>>> generateWordSelectionCombinations(int index,
+																		List<String> words,
+																		List<Short> wordIndexCombination,
+																		List<List<Integer>> prefix,
+																		Map<String, List<List<Integer>>> allPossibleWordsSelections) {
+		if (index == wordIndexCombination.size()) {
+			return List.of(prefix);
+		}
+
+		List<List<List<Integer>>> result = new ArrayList<>();
+
+		final String word = words.get(wordIndexCombination.get(index));
+		for (List<Integer> wordSelection : allPossibleWordsSelections.get(word)) {
+			List<List<Integer>> newPrefix = new ArrayList<>(prefix);
+			newPrefix.add(wordSelection);
+			result.addAll(generateWordSelectionCombinations(index + 1, words, wordIndexCombination, newPrefix, allPossibleWordsSelections));
+		}
+		return result;
 	}
 }
