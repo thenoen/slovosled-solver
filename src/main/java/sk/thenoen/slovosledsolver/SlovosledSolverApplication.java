@@ -21,6 +21,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import sk.thenoen.slovosledsolver.model.Bonus;
 import sk.thenoen.slovosledsolver.model.Game;
 import sk.thenoen.slovosledsolver.model.Tile;
 
@@ -65,6 +66,8 @@ public class SlovosledSolverApplication implements CommandLineRunner {
 									   .map(l -> l.getLetter())
 									   .toList();
 
+		final Bonus bonus = pageParser.retrieveBonus();
+
 		final List<String> words = wordsFinder.findWords(grid, Set.of(hashes));
 
 		logger.info("Number of parsed hashes: {}", hashes.length);
@@ -107,13 +110,14 @@ public class SlovosledSolverApplication implements CommandLineRunner {
 		Map<String, List<List<Integer>>> allPossibleWordSelectionCombinations = gameGenerator.generateAllPossibleWordSelectionCombinations(tiles,
 																																		   selectedWords);
 
-		playGames(selectedWords, tiles, allPossibleWordSelectionCombinations);
+		playGames(selectedWords, tiles, bonus, allPossibleWordSelectionCombinations);
 
 		logger.info("SlovosledSolverApplication finished");
 	}
 
 	public Map<List<String>, List<List<List<Integer>>>> playGames(List<String> words,
 																  List<Tile> tiles,
+																  Bonus bonus,
 																  Map<String, List<List<Integer>>> allPossibleWordsSelections) {
 		final Stream<String> wordIndexCombinationStream = dataStorage.readWordIndexCombinationsFromDisk();
 
@@ -143,7 +147,7 @@ public class SlovosledSolverApplication implements CommandLineRunner {
 				final List<String> selectedWords = indicesOfSelectedWords.stream()
 																		 .map(words::get)
 																		 .toList();
-				final Game game = new Game(tiles, selectedWords, wordSelectionCombination);
+				final Game game = new Game(tiles, bonus, selectedWords, wordSelectionCombination);
 				final long score = game.play();
 
 				if (score > bestScore) {

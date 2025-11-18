@@ -12,6 +12,8 @@ import java.util.regex.Pattern;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectReader;
+import sk.thenoen.slovosledsolver.model.Bonus;
 import sk.thenoen.slovosledsolver.model.Tile;
 
 @Component
@@ -106,6 +108,35 @@ public class PageParser {
 			logger.debug(hash);
 		}
 		return hashes;
+
+	}
+
+	public Bonus retrieveBonus() {
+		final String pageContent = pageDownloader.retrievePageContent();
+		return parseBonus(pageContent);
+	}
+
+	private Bonus parseBonus(String content) {
+
+		//	window.bonus = {
+		//		"pattern": "1303",
+		//				"value": 15,
+		//				"text": "za slovo kon\u010diace na samohl\u00e1sku",
+		//				"index": 7
+		//	};
+
+		Pattern pattern = Pattern.compile(".*?window.bonus = (.*?);");
+		var matcher = pattern.matcher(content);
+		matcher.find();
+		String bonusString = matcher.group(1);
+		logger.info("Parsed bonus: {}", bonusString);
+
+		try {
+			final Bonus bonus = objectMapper.readerFor(Bonus.class).readValue(bonusString);
+			return bonus;
+		} catch (JsonProcessingException e) {
+			throw new RuntimeException(e);
+		}
 
 	}
 

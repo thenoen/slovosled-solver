@@ -68,6 +68,10 @@ public class Tile {
 		selected = true;
 	}
 
+	public boolean isReachedMax() {
+		return reachedMax;
+	}
+
 	@Override
 	public String toString() {
 		return letter + "(" + value + ")";

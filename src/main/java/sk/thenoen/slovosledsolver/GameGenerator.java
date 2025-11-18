@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
+import sk.thenoen.slovosledsolver.model.Bonus;
 import sk.thenoen.slovosledsolver.model.Game;
 import sk.thenoen.slovosledsolver.model.Tile;
 
@@ -80,7 +81,7 @@ public class GameGenerator {
 				final List<String> selectedWords = indicesOfSelectedWords.stream()
 																		 .map(words::get)
 																		 .toList();
-				final Game game = new Game(tiles, selectedWords, wordSelectionCombination);
+				final Game game = new Game(tiles, new Bonus(), selectedWords, wordSelectionCombination);
 				final long score = game.play();
 
 				if (score > bestScore) {
