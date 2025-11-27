@@ -49,16 +49,19 @@ public class WordsFinder {
 	private void shutdown() {
 
 		long maxTasks = taskExecutor.getQueueSize();
+		long progress = 0;
 
 		do {
-
 			long currentTasks = taskExecutor.getQueueSize();
-			long percentage = (currentTasks * 100) / maxTasks;
+			long newProgress = (currentTasks * 100) / maxTasks;
 
-			logger.info("Waiting for tasks to finish ... {}% \t Active: {},\tQueue: {}",
-						percentage,
-						taskExecutor.getActiveCount(),
-						taskExecutor.getQueueSize());
+			if (newProgress != progress) {
+				logger.info("Waiting for tasks to finish ... {}% \t Active: {},\tQueue: {}",
+							newProgress,
+							taskExecutor.getActiveCount(),
+							taskExecutor.getQueueSize());
+				progress = newProgress;
+			}
 
 			try {
 				Thread.sleep(1000);

@@ -29,6 +29,8 @@ import sk.thenoen.slovosledsolver.model.Tile;
 public class SlovosledSolverApplication implements CommandLineRunner {
 
 	private static final Logger logger = LoggerFactory.getLogger(SlovosledSolverApplication.class);
+	public static final int MIN_NUMBER_OF_WORDS = 40;
+	public static final int MAX_NUMBER_OF_WORDS = 50;
 
 	@Resource
 	private PageParser pageParser;
@@ -95,7 +97,8 @@ public class SlovosledSolverApplication implements CommandLineRunner {
 													   .collect(Collectors.toList());
 		List<String> selectedWords = new ArrayList<>();
 		for (int i = 0; i < wordLengths.size(); i++) {
-			if (selectedWords.size() < 20) {
+			if (selectedWords.size() < MIN_NUMBER_OF_WORDS &&
+				selectedWords.size() + wordsByLength.get(wordLengths.get(i)).size() <= MAX_NUMBER_OF_WORDS) {
 				final Integer wordsLength = wordLengths.get(i);
 				final List<String> wordsWithLength = wordsByLength.get(wordsLength);
 				selectedWords.addAll(wordsWithLength);

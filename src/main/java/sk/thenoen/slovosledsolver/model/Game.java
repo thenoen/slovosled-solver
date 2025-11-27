@@ -13,6 +13,7 @@ public class Game {
 	private List<Tile> tiles;
 	private List<String> words;
 	private final Bonus bonus;
+	private boolean bonusActive;
 	private List<List<Integer>> wordSelections;
 	private long score = 0;
 
@@ -45,6 +46,10 @@ public class Game {
 			logger.debug("\t{}: {}", word, wordSelection);
 			long wordSum = 0;
 
+			if (!bonusActive) {
+				bonusActive = isBonusActive();
+			}
+
 			for (int j = 0; j < wordSelection.size(); j++) {
 				final int index = wordSelection.get(j);
 				final Tile tile = tiles.get(index);
@@ -54,7 +59,6 @@ public class Game {
 
 			logger.debug("\ttiles after word {}: {}", word, tiles);
 
-			boolean bonusActive = isBonusActive();
 			long bonusScore = 0;
 			if (bonusActive) {
 				bonusScore = calculateBonusScore(word);
