@@ -156,7 +156,7 @@ public class SlovosledSolverApplication implements CommandLineRunner {
 				if (score > bestScore) {
 					bestScore = score;
 //					logger.info("Found best score: {} for word combination {}", bestScore, selectedWords);
-					logger.info("Found best score: {} for word combination {}", bestScore, wordIndexCombination);
+					logger.info("Found best score: {} for word combination {}", bestScore, wordSelectionCombination);
 				}
 			}
 
