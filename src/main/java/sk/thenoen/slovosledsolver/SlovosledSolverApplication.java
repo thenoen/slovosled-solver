@@ -153,7 +153,7 @@ public class SlovosledSolverApplication implements CommandLineRunner {
 				final Game game = new Game(tiles, bonus, selectedWords, wordSelectionCombination);
 				final long score = game.play();
 
-				if (score > bestScore) {
+				if (score >= bestScore) {
 					bestScore = score;
 //					logger.info("Found best score: {} for word combination {}", bestScore, selectedWords);
 					logger.info("Found best score: {} for word combination {}", bestScore, wordSelectionCombination);
