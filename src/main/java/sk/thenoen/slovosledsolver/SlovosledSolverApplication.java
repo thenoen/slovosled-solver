@@ -95,6 +95,9 @@ public class SlovosledSolverApplication implements CommandLineRunner {
 													   .stream()
 													   .sorted(Comparator.comparingInt(Integer::intValue).reversed())
 													   .collect(Collectors.toList());
+
+		wordsByLength.keySet().forEach(l -> logger.info("Length {}: {} words", l, wordsByLength.get(l).size()));
+
 		List<String> selectedWords = new ArrayList<>();
 		for (int i = 0; i < wordLengths.size(); i++) {
 			if (selectedWords.size() < MIN_NUMBER_OF_WORDS &&
