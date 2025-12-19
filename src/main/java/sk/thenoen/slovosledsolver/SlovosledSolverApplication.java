@@ -7,6 +7,11 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -18,9 +23,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import sk.thenoen.slovosledsolver.model.Bonus;
 import sk.thenoen.slovosledsolver.model.Game;
 import sk.thenoen.slovosledsolver.model.Tile;
@@ -31,6 +40,8 @@ public class SlovosledSolverApplication implements CommandLineRunner {
 	private static final Logger logger = LoggerFactory.getLogger(SlovosledSolverApplication.class);
 	public static final int MIN_NUMBER_OF_WORDS = 40;
 	public static final int MAX_NUMBER_OF_WORDS = 50;
+	//	public static final int MIN_NUMBER_OF_WORDS = 5;
+	//	public static final int MAX_NUMBER_OF_WORDS = 10;
 
 	@Resource
 	private PageParser pageParser;
@@ -133,6 +144,10 @@ public class SlovosledSolverApplication implements CommandLineRunner {
 		}
 
 		long bestScore = 0;
+		Game bestGame = null;
+		boolean firstGameSubmitted = false;
+		final long initialHighScore = pageParser.getInitialHighScore();
+		logger.info("Initial high score: {}", initialHighScore);
 		long currentIndex = 0;
 		long progress = -1;
 		final Iterator<String> iterator = wordIndexCombinationStream.iterator();
@@ -158,14 +173,20 @@ public class SlovosledSolverApplication implements CommandLineRunner {
 
 				if (score > bestScore) {
 					bestScore = score;
-//					logger.info("Found best score: {} for word combination {}", bestScore, selectedWords);
+					bestGame = game;
+					//					logger.info("Found best score: {} for word combination {}", bestScore, selectedWords);
 					logger.info("Found best score: {} for word combination:", bestScore);
 					for (int i = 0; i < selectedWords.size(); i++) {
 						logger.info("\t{}: {}",
 									selectedWords.get(i).replaceAll("[A-Ž]", "*"),
+								//									selectedWords.get(i),
 									wordSelectionCombination.get(i));
 					}
 					logger.info("---");
+					if (!firstGameSubmitted && bestScore > initialHighScore) {
+						firstGameSubmitted = true;
+						submitGameSafely(bestGame);
+					}
 				}
 			}
 
@@ -174,9 +195,107 @@ public class SlovosledSolverApplication implements CommandLineRunner {
 				logger.info("Progress: {} %", newProgress);
 				progress = newProgress;
 			}
+
 		}
 
+		//		encodeWordIndexes(wordIndexes) {
+		//                        const indexPart = wordIndexes.map(i => i.toString(12).toUpperCase()).join('');
+		//                        const lenDigit = (wordIndexes.length - 1).toString(12).toUpperCase();
+		//                        const full = indexPart + lenDigit;
+		//			return parseInt(full, 12);
+		//
+		//			full			:			"B039A586"
+		//			indexPart			:			"B039A58"
+		//			lenDigit			:			"6"
+		//			wordIndexes			:			Proxy(Array) {0: 11, 1: 0, 2: 3, 3: 9, 4: 10, 5: 5, 6: 8}
+		//		}
+
+		//		submitScore() {
+		//                        const payload = {
+		//					score: this.score,
+		//					words: this.submittedWordsIndexes.map( (word) => this.encodeWordIndexes(word))
+		//                        };
+		//			fetch('/api/validate-score', {
+		//					method: 'POST',
+		//					headers: {
+		//				'Content-Type': 'application/json',
+		//						'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+		//			},
+		//			body: JSON.stringify(payload)
+		//                        }).then(response => response.json()).then(data => {// Handle response as needed.
+		//																  }
+		//			).catch(error => console.error('Error submitting score:', error));
+		//		},
+
 		return null;
+	}
+
+	private long encodeWordIndexes(List<Integer> wordSelection) {
+		String indexPart = wordSelection.stream()
+										.map(Integer::toHexString)
+										.collect(Collectors.joining());
+		String lenDigit = Integer.toHexString(wordSelection.size() - 1);
+		String full = indexPart + lenDigit;
+
+		return Long.parseLong(full, 12);
+	}
+
+	private void submitGameSafely(Game game) {
+		try {
+			logger.info("Submitting game with score {}", game.getScore());
+			submitGame(game);
+			logger.info("Game submitted successfully\n\n");
+		} catch (IOException | InterruptedException e) {
+			logger.error("Unable to submit game", e);
+		}
+	}
+
+	private void submitGame(Game game) throws IOException, InterruptedException {
+		final List<Long> words = game.getWordSelections()
+									 .stream()
+									 .map(this::encodeWordIndexes)
+									 .toList();
+		final long score = game.getScore();
+
+		final Payload payload = new Payload(score, words);
+
+		final String csrfToken = pageParser.parseCsrfToken();
+
+		ObjectMapper objectMapper = new ObjectMapper();
+		String requestBody = objectMapper
+//				.writerWithDefaultPrettyPrinter()
+				.writeValueAsString(payload);
+		// {"score":1,"words":[141471,141543,1697248,153063,152991]}
+
+		HttpRequest request = HttpRequest.newBuilder(URI.create("https://slovosled.dennikn.sk/api/validate-score"))
+										 .header("Content-Type", "application/json")
+										 .header("X-CSRF-TOKEN", csrfToken)
+										 .POST(HttpRequest.BodyPublishers.ofString(requestBody))
+										 .build();
+
+		final HttpResponse<String> httpResponse = HttpClient.newHttpClient()
+															.send(request, HttpResponse.BodyHandlers.ofString());
+
+		logger.info("Response ({}): {}", httpResponse.statusCode(), httpResponse.body());
+	}
+
+	private class Payload {
+
+		private long score;
+		private List<Long> words;
+
+		public Payload(long score, List<Long> words) {
+			this.score = score;
+			this.words = words;
+		}
+
+		public long getScore() {
+			return score;
+		}
+
+		public List<Long> getWords() {
+			return words;
+		}
 	}
 
 	private List<List<List<Integer>>> generateWordSelectionCombinations(int index,

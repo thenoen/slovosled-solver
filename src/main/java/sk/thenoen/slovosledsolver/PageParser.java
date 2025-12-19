@@ -140,4 +140,29 @@ public class PageParser {
 
 	}
 
+	public String parseCsrfToken() {
+		final String pageContent = pageDownloader.retrievePageContent();
+		// todo: here should be caching
+
+		Pattern pattern = Pattern.compile(".*?<meta.*?name=\"csrf-token\".*?content=\"(.*?)\".*?>");
+		var matcher = pattern.matcher(pageContent);
+		matcher.find();
+		String csrfToken = matcher.group(1);
+
+		return csrfToken;
+	}
+
+	public long getInitialHighScore() {
+		final String pageContent = pageDownloader.retrievePageContent(false);
+		Pattern pattern = Pattern.compile(".*?window.initialHighscore = (.*?);");
+		var matcher = pattern.matcher(pageContent);
+		matcher.find();
+		String highScoreString = matcher.group(1);
+		try {
+			return Long.parseLong(highScoreString);
+		} catch (NumberFormatException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
 }

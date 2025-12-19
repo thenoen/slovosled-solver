@@ -156,4 +156,8 @@ public class Game {
 	public long getScore() {
 		return score;
 	}
+
+	public List<List<Integer>> getWordSelections() {
+		return wordSelections;
+	}
 }

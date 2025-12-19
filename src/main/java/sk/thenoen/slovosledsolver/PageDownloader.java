@@ -24,11 +24,15 @@ public class PageDownloader {
 	private static final String PAGE_CACHE_LOCATION = "/tmp/slovosled-page-cache.txt";
 
 	public String retrievePageContent() {
+		return retrievePageContent(true);
+	}
+
+	public String retrievePageContent(boolean useCache) {
 		var pageCacheFile = new File(PAGE_CACHE_LOCATION);
 
 		String pageContent = null;
 
-		if (pageCacheFile.exists()) {
+		if (useCache && pageCacheFile.exists()) {
 			pageContent = readPageFromCache(pageCacheFile);
 		} else {
 			pageContent = downloadPage();
