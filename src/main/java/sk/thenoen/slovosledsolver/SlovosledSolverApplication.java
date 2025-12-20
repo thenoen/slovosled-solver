@@ -3,6 +3,7 @@ package sk.thenoen.slovosledsolver;
 import jakarta.annotation.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -38,10 +39,12 @@ import sk.thenoen.slovosledsolver.model.Tile;
 public class SlovosledSolverApplication implements CommandLineRunner {
 
 	private static final Logger logger = LoggerFactory.getLogger(SlovosledSolverApplication.class);
-	public static final int MIN_NUMBER_OF_WORDS = 40;
+	public static final int MIN_NUMBER_OF_WORDS = 5;
 	public static final int MAX_NUMBER_OF_WORDS = 50;
-	//	public static final int MIN_NUMBER_OF_WORDS = 5;
 	//	public static final int MAX_NUMBER_OF_WORDS = 10;
+
+	@Value("${slovosled.submit-best-score:false}")
+	private boolean submitBestScore;
 
 	@Resource
 	private PageParser pageParser;
@@ -183,7 +186,7 @@ public class SlovosledSolverApplication implements CommandLineRunner {
 									wordSelectionCombination.get(i));
 					}
 					logger.info("---");
-					if (!firstGameSubmitted && bestScore > initialHighScore) {
+					if (submitBestScore && !firstGameSubmitted && bestScore > initialHighScore) {
 						firstGameSubmitted = true;
 						submitGameSafely(bestGame);
 					}
