@@ -46,6 +46,9 @@ public class SlovosledSolverApplication implements CommandLineRunner {
 	@Value("${slovosled.submit-best-score:false}")
 	private boolean submitBestScore;
 
+	@Value("${slovosled.anonymize-words:false}")
+	private boolean anonymizeWords;
+
 	@Resource
 	private PageParser pageParser;
 
@@ -176,12 +179,16 @@ public class SlovosledSolverApplication implements CommandLineRunner {
 				if (score > bestScore) {
 					bestScore = score;
 					bestGame = game;
-					//					logger.info("Found best score: {} for word combination {}", bestScore, selectedWords);
-					logger.info("Found best score: {} for word combination:", bestScore);
+					logger.info("Found best score: {} (bonus: {}) for word combination:", bestScore, game.getBonusActive());
 					for (int i = 0; i < selectedWords.size(); i++) {
+						final String word;
+						if (anonymizeWords) {
+							word = selectedWords.get(i).replaceAll("[A-Ž]", "*");
+						} else {
+							word = selectedWords.get(i);
+						}
 						logger.info("\t{}: {}",
-									selectedWords.get(i).replaceAll("[A-Ž]", "*"),
-								//									selectedWords.get(i),
+									word,
 									wordSelectionCombination.get(i));
 					}
 					logger.info("---");

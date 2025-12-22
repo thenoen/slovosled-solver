@@ -160,4 +160,8 @@ public class Game {
 	public List<List<Integer>> getWordSelections() {
 		return wordSelections;
 	}
+
+	public boolean getBonusActive() {
+		return bonusActive;
+	}
 }
