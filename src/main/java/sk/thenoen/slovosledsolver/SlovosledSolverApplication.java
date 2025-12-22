@@ -135,11 +135,10 @@ public class SlovosledSolverApplication implements CommandLineRunner {
 		logger.info("SlovosledSolverApplication finished");
 	}
 
-	public Map<List<String>, List<List<List<Integer>>>> playGames(List<String> words,
-																  List<Tile> tiles,
-																  Bonus bonus,
-																  Map<String, List<List<Integer>>> allPossibleWordsSelections) {
-		final Stream<String> wordIndexCombinationStream = dataStorage.readWordIndexCombinationsFromDisk();
+	public void playGames(List<String> words,
+						  List<Tile> tiles,
+						  Bonus bonus,
+						  Map<String, List<List<Integer>>> allPossibleWordsSelections) {
 
 		long wordIndexCombinationCount = 1;
 		for (int i = 0; i < 5; i++) {
@@ -153,6 +152,7 @@ public class SlovosledSolverApplication implements CommandLineRunner {
 		logger.info("Initial high score: {}", initialHighScore);
 		long currentIndex = 0;
 		long progress = -1;
+		final Stream<String> wordIndexCombinationStream = dataStorage.readWordIndexCombinationsFromDisk();
 		final Iterator<String> iterator = wordIndexCombinationStream.iterator();
 		while (iterator.hasNext()) {
 			final String wordIndexCombination = iterator.next();
@@ -164,7 +164,6 @@ public class SlovosledSolverApplication implements CommandLineRunner {
 																										  indicesOfSelectedWords,
 																										  new ArrayList<>(new ArrayList<>()),
 																										  allPossibleWordsSelections);
-			//			logger.info("Found {} possible word selection combinations for word combination {}", wordSelectionCombinations.size(), wordIndexCombination);
 
 			currentIndex++;
 			for (List<List<Integer>> wordSelectionCombination : wordSelectionCombinations) {
@@ -198,39 +197,7 @@ public class SlovosledSolverApplication implements CommandLineRunner {
 				logger.info("Progress: {} %", newProgress);
 				progress = newProgress;
 			}
-
 		}
-
-		//		encodeWordIndexes(wordIndexes) {
-		//                        const indexPart = wordIndexes.map(i => i.toString(12).toUpperCase()).join('');
-		//                        const lenDigit = (wordIndexes.length - 1).toString(12).toUpperCase();
-		//                        const full = indexPart + lenDigit;
-		//			return parseInt(full, 12);
-		//
-		//			full			:			"B039A586"
-		//			indexPart			:			"B039A58"
-		//			lenDigit			:			"6"
-		//			wordIndexes			:			Proxy(Array) {0: 11, 1: 0, 2: 3, 3: 9, 4: 10, 5: 5, 6: 8}
-		//		}
-
-		//		submitScore() {
-		//                        const payload = {
-		//					score: this.score,
-		//					words: this.submittedWordsIndexes.map( (word) => this.encodeWordIndexes(word))
-		//                        };
-		//			fetch('/api/validate-score', {
-		//					method: 'POST',
-		//					headers: {
-		//				'Content-Type': 'application/json',
-		//						'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-		//			},
-		//			body: JSON.stringify(payload)
-		//                        }).then(response => response.json()).then(data => {// Handle response as needed.
-		//																  }
-		//			).catch(error => console.error('Error submitting score:', error));
-		//		},
-
-		return null;
 	}
 
 	private long encodeWordIndexes(List<Integer> wordSelection) {
@@ -265,10 +232,7 @@ public class SlovosledSolverApplication implements CommandLineRunner {
 		final String csrfToken = pageParser.parseCsrfToken();
 
 		ObjectMapper objectMapper = new ObjectMapper();
-		String requestBody = objectMapper
-//				.writerWithDefaultPrettyPrinter()
-				.writeValueAsString(payload);
-		// {"score":1,"words":[141471,141543,1697248,153063,152991]}
+		String requestBody = objectMapper.writeValueAsString(payload);
 
 		HttpRequest request = HttpRequest.newBuilder(URI.create("https://slovosled.dennikn.sk/api/validate-score"))
 										 .header("Content-Type", "application/json")
