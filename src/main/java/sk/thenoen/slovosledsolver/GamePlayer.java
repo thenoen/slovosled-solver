@@ -31,7 +31,7 @@ public class GamePlayer {
 	@Value("${slovosled.submit-best-score:false}")
 	private boolean submitBestScore;
 
-	@Value("${slovosled.anonymize-words:false}")
+	@Value("${slovosled.anonymize-words:true}")
 	private boolean anonymizeWords;
 
 	@Resource
